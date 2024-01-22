@@ -1,2 +1,6 @@
 # ymail
-this is a simple smtp demo
+当成一个简单的smtp服务器，
+仅仅是提供基础的服务，
+该服务器端口可以不开放
+由内部调用
+可以打成jar包，由下游服务进行管理和调用

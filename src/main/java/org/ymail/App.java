@@ -1,9 +1,9 @@
-package org.example;
+package org.ymail;
 
-import com.alibaba.fastjson.JSON;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 /**
  * Hello world!
  */
+@SpringBootApplication
 public class App {
     static class Email {
         String subject;
@@ -31,7 +32,8 @@ public class App {
         }
     }
 
-    public static void main(String[] args) throws UnsupportedEncodingException {
+    public static void main(String[] args)  {
+        SpringApplication.run(App.class,args);
 //        Email  e=new Email();
 //        e.setSubject("hello");
 ////        JSON.toJSONString();
@@ -75,7 +77,7 @@ public class App {
 //            String charset = matcher.group(1);
 //            System.out.println(charset);
 //        }
-        getSubject("Subject: =?gb18030?B?1vfM4g==?=");
+//        getSubject("Subject: =?gb18030?B?1vfM4g==?=");
 
     }
 

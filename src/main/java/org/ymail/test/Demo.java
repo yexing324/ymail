@@ -1,4 +1,4 @@
-package org.example.test;
+package org.ymail.test;
 
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
