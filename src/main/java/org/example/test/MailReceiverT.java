@@ -25,7 +25,7 @@ public class MailReceiverT {
     public void receiveMail() {
 
         try {
-            server = new ServerSocket(28);
+            server = new ServerSocket(25);
             // 写日志文件
             log("服务器启动等待连接......");
             // 启动服务
@@ -50,17 +50,26 @@ public class MailReceiverT {
             while (true) {
                 String getmsg = getmsg();
                 mes += getmsg;
+                //
+                if (getmsg.startsWith("From")) {
+                    getFrom(getmsg);
+                } else if (getmsg.startsWith("To")) {
+                    getTo(getmsg);
+                } else if (getmsg.startsWith("Subject")) {
+                    getSubject(getmsg);
+                }
+                //
                 if (getmsg.contains("plain")) {
                     String charset = "";
-                    charset = getmsg.contains("charset") ? getChatSet(getmsg):charset;
+                    charset = getmsg.contains("charset") ? getChatSet(getmsg) : charset;
                     boolean base = false;
                     String line = getmsg();
                     while (!(line == null || line.equals(""))) {
-                        charset = line.contains("charset") ? getChatSet(line):charset;
+                        charset = line.contains("charset") ? getChatSet(line) : charset;
                         base = base || line.contains("base64");
                         line = getmsg();
                     }
-                    System.out.println("编码是:"+charset);
+                    System.out.println("plain编码是:" + charset);
                     //开始正文...
                     line = getmsg();
                     StringBuilder plainText = new StringBuilder();
@@ -74,6 +83,33 @@ public class MailReceiverT {
                         System.out.println(plainText + charset);
                     }
                     System.out.println("正文结束:" + plainText);
+                }
+                if (getmsg.contains("html")) {
+                    String charset = "";
+                    charset = getmsg.contains("charset") ? getChatSet(getmsg) : charset;
+                    boolean base = false;
+                    String line = getmsg();
+                    while (!(line == null || line.equals(""))) {
+                        charset = line.contains("charset") ? getChatSet(line) : charset;
+                        base = base || line.contains("base64");
+                        line = getmsg();
+                    }
+                    System.out.println("html编码是:" + charset);
+                    //开始正文...
+                    line = getmsg();
+                    StringBuilder plainText = new StringBuilder();
+                    while (!line.startsWith("--")) {
+                        plainText.append(line);
+                        line = getmsg();
+                    }
+                    if (base) {//进行了64编码
+                        System.out.println("获得的base64码:\n" + String.valueOf(plainText));
+                        System.out.println("即将进行base64解码:" + charset);
+                        from64(String.valueOf(plainText), charset);
+                    } else {
+                        System.out.println(plainText + charset);
+                    }
+                    System.out.println("html正文结束:" + plainText);
                 }
                 if (getmsg.equals(".")) {
                     break;
@@ -172,17 +208,28 @@ public class MailReceiverT {
         System.out.println();
     }
 
-    public void from64(String x, String code) {
+    static final Base64.Decoder decoder = Base64.getMimeDecoder();
+
+    public  String from64(String x, String code) {
         try {
-//            String text = "Java 8 Base64 编码解码 - Java8新特性";
-//            String base64encodedString = Base64.getUrlEncoder().encodeToString(text.getBytes("utf-8"));
-//            System.out.println(base64encodedString);
-            byte[] base64decodedBytes = Base64.getUrlDecoder().decode(x);
-            System.out.println("内容是:" + new String(base64decodedBytes, code));
-        } catch (UnsupportedEncodingException e) {
-            System.out.println("异常：" + e.getMessage());
+
+            String text = new String(decoder.decode(x.replaceAll("\n", "")), code);
+            System.out.println("内容是:" + text);
+            return text;
+        } catch (Exception e) {
+            return "出现了异常";
         }
+//        try {
+////            String text = "Java 8 Base64 编码解码 - Java8新特性";
+////            String base64encodedString = Base64.getUrlEncoder().encodeToString(text.getBytes("utf-8"));
+////            System.out.println(base64encodedString);
+//            byte[] base64decodedBytes = Base64.getUrlDecoder().decode(x);
+//            System.out.println("内容是:" + new String(base64decodedBytes, code));
+//        } catch (UnsupportedEncodingException e) {
+//            System.out.println("异常：" + e.getMessage());
+//        }
     }
+
     public String getChatSet(String input) {
         String charset = "";
         if (input.contains("\"")) {
@@ -193,7 +240,7 @@ public class MailReceiverT {
                 charset = matcher.group(1);
                 return charset;
             }
-        }else{
+        } else {
             String pattern = "charset=([a-zA-Z0-9-]+)";
 
             Pattern regex = Pattern.compile(pattern);
@@ -205,6 +252,93 @@ public class MailReceiverT {
             }
         }
         return "UTF-8";
+    }
+
+    public void getFrom(String str) {
+        String code = "", name = "", addr = "";
+        if (str.contains("=?")) {//采用了编码
+            String codeP = "=?\\?(.*?)\\?B?";//获得编码
+            String nameP = "\\?B?\\?(.*?)\\?=";//获得名称
+            String addrP = " <(.*?)>";//获得邮件
+
+            Matcher matcher = Pattern.compile(codeP).matcher(str);
+            matcher.find();
+            code = matcher.group(1);
+            matcher=Pattern.compile(nameP).matcher(str);
+            matcher.find();
+            String nameBase = matcher.group(1);
+            matcher=Pattern.compile(addrP).matcher(str);
+            matcher.find();
+            addr = matcher.group(1);
+            name=from64(nameBase,code);
+            System.out.println("from的解析结果:"+code+name+addr);
+        } else {//没有采用编码，可以直接处理
+
+            String addrP = " <(.*?)>";//获得邮件
+            String nameP = "From: (.*?) <";//获得名称
+
+            Matcher matcher=Pattern.compile(nameP).matcher(str);
+            matcher.find();
+            name = matcher.group(1);
+            matcher=Pattern.compile(addrP).matcher(str);
+            matcher.find();
+            addr = matcher.group(1);
+            System.out.println("from的解析结果:"+code+name+addr);
+        }
+    }
+
+    public void getTo(String str) {
+        String code = "", name = "", addr = "";
+        if (str.contains("=?")) {//采用了编码
+            String codeP = "=?\\?(.*?)\\?B?";//获得编码
+            String nameP = "\\?B?\\?(.*?)\\?=";//获得名称
+            String addrP = " <(.*?)>";//获得邮件
+            Matcher matcher = Pattern.compile(codeP).matcher(str);
+            matcher.find();
+            code = matcher.group(1);
+            matcher=Pattern.compile(nameP).matcher(str);
+            matcher.find();
+            String nameBase = matcher.group(1);
+            matcher=Pattern.compile(addrP).matcher(str);
+            matcher.find();
+            addr = matcher.group(1);
+            name=from64(nameBase,code);
+            System.out.println("To的解析结果:"+code+name+addr);
+        } else {//没有采用编码，可以直接处理
+
+            String addrP = " <(.*?)>";//获得邮件
+            String nameP = "To: (.*?) <";//获得名称
+            Matcher matcher=Pattern.compile(nameP).matcher(str);
+            matcher.find();
+            name = matcher.group(1);
+            matcher=Pattern.compile(addrP).matcher(str);
+            matcher.find();
+            addr = matcher.group(1);
+            System.out.println("TO的解析结果:"+code+name+addr);
+        }
+    }
+    public void getSubject(String str) {
+        String code = "",  theme = "";
+        if (str.contains("=?")) {//采用了编码
+            String codeP = "=?\\?(.*?)\\?B?";//获得编码
+            String themeP = "\\?B?\\?(.*)";//获得名称
+
+            Matcher matcher = Pattern.compile(codeP).matcher(str);
+            matcher.find();
+            code = matcher.group(1);
+            matcher=Pattern.compile(themeP).matcher(str);
+            matcher.find();
+            String themeBase = matcher.group(1);
+
+            System.out.println("Subject的解析结果:"+code+from64(themeBase,code));
+        } else {//没有采用编码，可以直接处理
+
+            String themeP = ": (.*)";//获得邮件
+            Matcher matcher=Pattern.compile(themeP).matcher(str);
+            matcher.find();
+            theme = matcher.group(1);
+            System.out.println("Subject的解析结果:"+theme);
+        }
     }
 
 }

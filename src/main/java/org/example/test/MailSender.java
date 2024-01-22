@@ -41,7 +41,7 @@ public class MailSender {
             }else{
                 host=Demo.getMailHost(host);
             }
-            server = new Socket(host, 28);
+            server = new Socket(host, 25);
             InputStream ins = server.getInputStream();
             OutputStream outs = server.getOutputStream();
             in = new Scanner(ins);
@@ -53,7 +53,7 @@ public class MailSender {
             System.out.print("input from:");
             String from = sc.nextLine();
             if (from.equals("1")||from.equals("2"))
-                from = "yexingyun@jinnrry.com";
+                from = "yexingyun@pmail.slovety.top";
             send("MAIL FROM:<" + from + ">");
 
             receive();
@@ -63,7 +63,7 @@ public class MailSender {
                 to = "yexing195@163.com";
 
             else if(to.equals("2"))
-                to="2572508697@qq.com";
+                to="2420233025@qq.com";
 
             send("RCPT TO:<" + to + ">");
             receive();
@@ -85,18 +85,27 @@ public class MailSender {
 
             send("DATA");
             receive();
+            send("h=From:To:Subject:Date;");
+            send("From: \"=?gb18030?B?eWV4aW5n?=\" <yexing@pmail.slovety.top>");
+            send("To: =?gb18030?B?0KHQ3MOo?= <yexing195@163.com>");
+            send("Subject: this is a theme");
+            send("Message-ID: <jinnrry_6E9F1A3FAB01D9AF1D200AFB4E40484C0407@jinnrry.com>");
             send("Content-Type: text/plain;");
-            send("charset=gb18030");
-            send("base64");
+            send("charset=\"gb18030\"");
+            send("Content-Transfer-Encoding: base64");
             send("");
-            System.out.print("input message Object and Text:");
-            String message = sc.nextLine();
-//            String[] split = message.split("/");
-//            send("MessageId:5877887");
-//            send("Subject:"+split[0]);
-//            send(split[1]);
-            send(message);
-            send("--sdfsda");
+            send("aGVsbG8sdGhpcyBpcyBhIHRlc3QgZW1haWwNCg0KDQrQodDcw6gNCjI0MjAyMzMwMjVAcXEu");
+            send("Y29tDQoNCg0KDQombmJzcDs=");
+            send("");
+            send("-----=_NextPart_65AD06B2_12B47D90_15F36F1D");
+
+//            String message = sc.nextLine();
+////            String[] split = message.split("/");
+////            send("MessageId:5877887");
+////            send("Subject:"+split[0]);
+////            send(split[1]);
+//            send(message);
+//            send("--sdfsda");
             send(".");
 
 //            Email e=new Email();
@@ -105,6 +114,8 @@ public class MailSender {
 //            out.print(Arrays.toString(JSON.toJSONBytes(e)) + "\r\n");
 //            out.flush();
 //            send(".");
+            receive();
+            receive();
             receive();
             send("QUIT");
             receive();
