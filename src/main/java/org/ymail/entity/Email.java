@@ -13,9 +13,11 @@ import java.util.Date;
 @Data
 @ToString
 public class Email  {
-
+    @TableField("`from`")
     String from;
+    @TableField("`to`")
     String to;
+    @TableField("`subject`")
     String subject;
     String plainText;
     String htmlText;
@@ -26,7 +28,8 @@ public class Email  {
      * 未读
      * 已读
      */
-    String status;
+    @TableField("`status`")
+    int status;
 
     /**
      * 默认分组

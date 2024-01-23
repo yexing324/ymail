@@ -43,13 +43,15 @@ public class MailSender {
             }else if(host.equals("127")){
                 host="127.0.0.1";
             }else{
-                host=getMailHost(host);
+//                host=getMailHost(host);
             }
             server = new Socket(host, 25);
             InputStream ins = server.getInputStream();
             OutputStream outs = server.getOutputStream();
             in = new Scanner(ins);
             out = new PrintWriter(outs);
+
+
             String hostName="jinnrry.com";
             receive();
             send("HELO " + hostName);
@@ -157,31 +159,4 @@ public class MailSender {
     }
 
 
-    public static InetAddress[] getMXRecords(String domainName) throws Exception {
-
-        Hashtable<String, String> env = new Hashtable<>();
-        env.put("java.naming.factory.initial", "com.sun.jndi.dns.DnsContextFactory");
-        DirContext ictx = new InitialDirContext( env );
-
-        Attributes attrs = ictx.getAttributes(domainName, new String[] { "MX" });
-        Attribute attr = attrs.get("MX");
-
-        // 解析结果
-        InetAddress[] addresses = new InetAddress[attr.size()];
-        for (int i = 0; i < attr.size(); i++) {
-            String mxRecord = (String)attr.get(i);
-            String[] mxParts = mxRecord.split(" ");
-            String host = mxParts[1];
-            addresses[i] = InetAddress.getByName(host);
-        }
-
-        return addresses;
-    }
-    public static String  getMailHost(String host) throws Exception {
-        InetAddress[] records = getMXRecords(host);
-        InetAddress record = records[0];
-        System.out.println(record);
-        String s= record.toString().split("/")[0];
-        return s.substring(0,s.length()-1);
-    }
 }
