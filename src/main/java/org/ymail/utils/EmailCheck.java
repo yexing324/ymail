@@ -43,7 +43,7 @@ public class EmailCheck {
 //        }
     }
     //通过正则获得内容
-    private static String getMesFromPattern(String str,String regex){
+    public static String getMesFromPattern(String str, String regex){
         Pattern pattern= Pattern.compile(regex);
         Matcher matcher = pattern.matcher(str);
         if (matcher.find()) {

@@ -13,7 +13,7 @@ import java.util.Hashtable;
 public class BaseUtils {
     static final Base64.Decoder decoder = Base64.getMimeDecoder();
     public String getFrom64(String ...str){
-        String code=str.length>1?str[1]:"gb18030";
+        String code=str.length>1?str[1]:"utf-8";
         try{
             return new String(decoder.decode(str[0].replaceAll("\n", "")), code);
         }catch (Exception ignored){
@@ -22,7 +22,7 @@ public class BaseUtils {
     }
     public String getBase64(String ...str){
         try {
-            String code=str.length>1?str[1]:"gb18030";
+            String code=str.length>1?str[1]:"utf-8";
             return Base64.getUrlEncoder().encodeToString(str[0].getBytes(code));
         }catch (Exception ignored){
             throw new RuntimeException("转码失败");

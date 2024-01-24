@@ -24,6 +24,8 @@ public class MailSender {
 
     public static final int DEFAULT_WHIDTH = 300;
     public static final int DEFAULT_HEIGHT = 300;
+    private InputStream inputStream;
+    private OutputStream outputStream;
 
 
     public void sendMail() {
@@ -45,12 +47,13 @@ public class MailSender {
             }else{
 //                host=getMailHost(host);
             }
-            server = new Socket(host, 25);
+            server = new Socket(host, 28);
             InputStream ins = server.getInputStream();
             OutputStream outs = server.getOutputStream();
             in = new Scanner(ins);
             out = new PrintWriter(outs);
-
+            inputStream = server.getInputStream();
+            outputStream = server.getOutputStream();
 
             String hostName="jinnrry.com";
             receive();
@@ -97,7 +100,7 @@ public class MailSender {
             send("Subject: this is a theme");
             send("Message-ID: <jinnrry_6E9F1A3FAB01D9AF1D200AFB4E40484C0407@jinnrry.com>");
             send("Content-Type: text/plain;");
-            send("charset=\"gb18030\"");
+            send("charset=\"utf-8\"");
             send("Content-Transfer-Encoding: base64");
             send("");
             send("aGVsbG8sdGhpcyBpcyBhIHRlc3QgZW1haWwNCg0KDQrQodDcw6gNCjI0MjAyMzMwMjVAcXEu");
@@ -148,9 +151,15 @@ public class MailSender {
     }
 
     private void receive() {
-        if (in.hasNextLine()) {
-            String line = in.nextLine();
-            System.out.println("server:" + line);
+        try {
+            while (inputStream.available() > 0) {
+                if (in.hasNextLine()) {
+                    String line = in.nextLine();
+                    System.out.println("server:" + line);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

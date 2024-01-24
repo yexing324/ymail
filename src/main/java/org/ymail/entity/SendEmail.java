@@ -9,7 +9,15 @@ import lombok.ToString;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SendEmail extends Email{
+public class SendEmail extends Email {
+    /**
+     * 真实的email地址
+     */
+    String realFrom;
+    /**
+     * 真实的发送地址
+     */
+    String realTo;
     /**
      * Message-ID
      */
@@ -35,7 +43,7 @@ public class SendEmail extends Email{
      * 结束标识
      * 暂定
      */
-    String end="------=_Part_31565_1009936633.1705838186609";
+    String end = "------=_Part_31565_1009936633.1705838186609";
 
     @Override
     public String toString() {
