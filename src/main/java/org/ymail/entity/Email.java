@@ -13,6 +13,10 @@ import java.util.Date;
 @Data
 @ToString
 public class Email  {
+    /**
+     * from前面的昵称
+     */
+    String nickname;
     @TableField("`from`")
     String from;
     @TableField("`to`")

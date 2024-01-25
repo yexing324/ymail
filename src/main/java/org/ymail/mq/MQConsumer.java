@@ -23,7 +23,7 @@ import org.ymail.utils.ThreadPool;
 public class MQConsumer {
     private final InitSendEmail initSendEmail;
     private final BaseUtils baseUtils;
-    private final String domain="jinnrry.com";
+    private final String domain="pmail.slovety.com";
     @Service
     @RocketMQMessageListener(topic = "email", selectorExpression = "*", consumerGroup = "email_one")
     public class ConsumerSend implements RocketMQListener<String> {

@@ -19,17 +19,14 @@ import static org.ymail.utils.EmailCheck.getMesFromPattern;
 @Component
 public class InitSendEmail {
     private final BaseUtils baseUtils;
-    private final String defaultCode="utf-8";
+    private final String defaultCode = "utf-8";
 
     public SendEmail initSendEmail(Email email) {
         //TODO:校验是否有unicode
         //全当unicode
         SendEmail sendEmail = new SendEmail();
-        //保留地址
-        sendEmail.setRealFrom(initRealFrom(email.getFrom()));
-        sendEmail.setRealTo(email.getTo());
-        //初始化from
-        sendEmail.setFrom(initFrom(email.getFrom()));
+        //初始化要发送的from
+        sendEmail.setSendFrom(initFrom(email.getNickname(), email.getFrom()));
         //初始化To
         sendEmail.setTo(initTo(email.getTo()));
         //初始化subject
@@ -56,13 +53,12 @@ public class InitSendEmail {
         return matcher.find();
     }
 
-    private String initFrom(String str) {
+    private String initFrom(String... str) {
         //由于已经检查了合法性，只需要nickname进行初始化
-        String[] split = str.trim().split(" ");
-        String name = split[0];
+        String name = str[0];
         String base64Name = baseUtils.getBase64(name);
         return "From: \"=?" + defaultCode + "?B?" + base64Name +
-                "?=\" " + split[1] ;
+                "?=\" <" + str[1] + ">";
     }
 
     private String initTo(String str) {
@@ -71,7 +67,7 @@ public class InitSendEmail {
 
     private String initSubject(String str) {
         String base64Str = baseUtils.getBase64(str);
-        return "Subject: =?" + defaultCode + "?B?" + base64Str+"?=";
+        return "Subject: =?" + defaultCode + "?B?" + base64Str + "?=";
     }
 
     private String initPlainType() {
@@ -91,7 +87,7 @@ public class InitSendEmail {
     }
 
     private String initMessageId() {
-        return "Message-ID: <" + UUID.randomUUID() +"@mail.jinnrry.com"+ ">";
+        return "Message-ID: <" + UUID.randomUUID() + "@mail.jinnrry.com" + ">";
     }
 
 }

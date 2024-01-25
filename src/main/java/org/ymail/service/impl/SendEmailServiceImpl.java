@@ -31,9 +31,10 @@ public class SendEmailServiceImpl implements SendEmailService {
      */
     @Override
     public Result<Void> sendEmail(Email email) {
-        //TODO:检查email格式是否正确
-        EmailCheck.checkEmail(email);
+        //此时传递可以影响到该email,直接在函数中修改即可
+        EmailCheck.checkEmailAndInit(email);
         email.setStatus(EmailStatus.SEND_READY.getValue());
+
         //发送到mq并写入数据库
         mqProducer.sendMsg(JSON.toJSONString(email));
         emailMapper.insert(email);

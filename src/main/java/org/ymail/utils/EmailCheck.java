@@ -7,12 +7,19 @@ import java.util.regex.Pattern;
 
 public class EmailCheck {
 
-    public static void checkEmail(Email email){
-        checkFrom(email.getFrom());
+    public static void checkEmailAndInit(Email email){
+        //
+        String addr = checkFromAndGetAddr(email.getFrom());
         checkTo(email.getTo());
+        String nickName = getNickName(email.getFrom());
+        email.setNickname(nickName);
+        email.setFrom(addr);
         //subject可以为空，不检测
+        if(email.getSubject()==null){
+            email.setSubject("无主题");
+        }
     }
-    public static void checkFrom(String str){
+    public static String checkFromAndGetAddr(String str){
         String emailAddr;
         try {
             //获得email的地址
@@ -26,7 +33,13 @@ public class EmailCheck {
         if(!str.trim().endsWith(">")){
             throw new RuntimeException("发件人email头部错误");
         }
+        return emailAddr;
     }
+    public static String getNickName(String str){
+        String[] split = str.trim().split(" ");
+        return split[0];
+    }
+
     public static void checkTo(String str){
         String emailAddr;
 //        try {

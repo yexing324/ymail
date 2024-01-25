@@ -37,7 +37,7 @@ public class MQProducer {
      * （msgBody也可以是对象，sendResult为返回的发送结果）
      */
     public SendResult sendMsg(String msgBody) {
-        SendResult sendResult = rocketMQTemplate.syncSend(topic, MessageBuilder.withPayload(msgBody).build());
+        SendResult sendResult = rocketMQTemplate.syncSend(topic, MessageBuilder.withPayload(msgBody).build(),10000);
         log.info("【sendMsg】sendResult={}", JSON.toJSONString(sendResult));
         return sendResult;
     }

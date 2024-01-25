@@ -49,20 +49,23 @@ public class Sender implements Runnable {
             send("HELO " + domain);
             receive();
 
-            send("MAIL FROM:<" + sendEmail.getRealFrom() + ">");
+            send("MAIL FROM:<" + sendEmail.getFrom() + ">");
             receive();
 
-            send("RCPT TO:<" + sendEmail.getRealTo() + ">");
+            send("RCPT TO:<" + sendEmail.getTo() + ">");
             receive();
 
             send("DATA");
             receive();
             send("h=From:To:Subject:Date;");
 //            send("DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;");
-            send(sendEmail.getFrom());
+            send(sendEmail.getSendFrom());
             send(sendEmail.getTo());
             send(sendEmail.getSubject());
             send(sendEmail.getMessageId());
+
+            //
+            send("boundary="+sendEmail.getEnd());
             //plain头部
             send(sendEmail.getPlainType());
             send(sendEmail.getPlainBase64());
@@ -70,7 +73,7 @@ public class Sender implements Runnable {
             send("");
             send(sendEmail.getPlainText());
             send("");
-//            send(sendEmail.getEnd());
+            send(sendEmail.getEnd());
             //暂时不发送html内容
 //            send("");
             send(".");
@@ -88,8 +91,8 @@ public class Sender implements Runnable {
 
             while (reader.available()>0) {
                 String line =in.nextLine();
-                log.warn("server:"+line);
-                System.out.println("server:" + line);
+//                log.warn("server:"+line);
+//                System.out.println("server:" + line);
                 Thread.sleep(2000);
             }
 
@@ -100,7 +103,7 @@ public class Sender implements Runnable {
     }
 
     private void send(String str) {
-        System.out.println("Sender:" + str);
+//        System.out.println("Sender:" + str);
         out.print(str.replaceAll("\n", "\r\n") + "\r\n");
         out.flush();
     }
@@ -115,7 +118,7 @@ public class Sender implements Runnable {
             }
             if (in.hasNextLine()) {
                 String line =in.nextLine();
-                log.warn("server:"+line);
+//                log.warn("server:"+line);
                 System.out.println("server:" + line);
             }
         } catch (Exception e) {

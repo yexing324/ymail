@@ -12,7 +12,7 @@ public class ThreadPool {
     /**
      * 构建公有线程池，节省资源
      */
-    private static final ThreadPoolExecutor pool = new ThreadPoolExecutor(3, 6, 2, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(2), new ThreadFactory() {
+    private static final ThreadPoolExecutor pool = new ThreadPoolExecutor(3, 20, 2, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(2), new ThreadFactory() {
         @Override
         public Thread newThread(@NonNull Runnable r) {
             Thread t = new Thread(r);

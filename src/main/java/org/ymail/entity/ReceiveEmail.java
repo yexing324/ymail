@@ -2,39 +2,19 @@ package org.ymail.entity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
-/**
- * 发送邮件实体类
- */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SendEmail extends Email {
+public class ReceiveEmail extends Email {
     /**
      * 真实的email地址
      */
-    String sendFrom;
+    String realFrom;
     /**
-     * Message-ID
+     * 真实的发送地址
      */
     String messageId;
-    /**
-     * text/html;charset=;
-     */
-    String plainType;
-    /**
-     * 同上
-     */
-    String HtmlType;
-    /**
-     * plain是否进行base编码
-     * Content-Type-Transfer-Encoding
-     */
-    String PlainBase64;
-    /**
-     * html是否进行base编码
-     */
-    String HtmlBase64;
+
     /**
      * 结束标识
      * 暂定
@@ -43,13 +23,11 @@ public class SendEmail extends Email {
 
     @Override
     public String toString() {
-        return "SendEmail{" +
-                "messageId='" + messageId + '\'' +
-                ", plainType='" + plainType + '\'' +
-                ", HtmlType='" + HtmlType + '\'' +
-                ", PlainBase64='" + PlainBase64 + '\'' +
-                ", HtmlBase64='" + HtmlBase64 + '\'' +
+        return "ReceiveEmail{" +
+                "realFrom='" + realFrom + '\'' +
+                ", messageId='" + messageId + '\'' +
                 ", end='" + end + '\'' +
+                ", nickname='" + nickname + '\'' +
                 ", from='" + from + '\'' +
                 ", to='" + to + '\'' +
                 ", subject='" + subject + '\'' +
