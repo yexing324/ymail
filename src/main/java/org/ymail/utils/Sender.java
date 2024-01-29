@@ -7,6 +7,7 @@ import org.ymail.entity.SendEmail;
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
+
 @Slf4j
 public class Sender implements Runnable {
     public Sender(SendEmail email, BaseUtils baseUtils, String domain) {
@@ -31,19 +32,22 @@ public class Sender implements Runnable {
     public void run() {
         //处理发送逻辑
         System.out.println("即将发送" + sendEmail);
+        sendEmail.setHtmlText("PGRpdiBzdHlsZT0iY29sb3I6cmVkIj7kvaDlpb08L2Rpdj4=");
         //首先获得host
         try {
             host = sendEmail.getTo().split("@")[1];
             //TODO:由于getHost会有一定的延迟
             //而mx地址并不常变，可以采用redis
-            host = baseUtils.getMailHost(host);
-//            host="163mx01.mxmail.netease.com";
+            if (host.equals("163.com")) {
+                host = "163mx01.mxmail.netease.com";
+            } else
+                host = baseUtils.getMailHost(host);
             server = new Socket(host, 25);
             inputStream = server.getInputStream();
             outputStream = server.getOutputStream();
             in = new Scanner(inputStream);
             out = new PrintWriter(outputStream);
-            reader=new DataInputStream(inputStream);
+            reader = new DataInputStream(inputStream);
             receive();
 
             send("HELO " + domain);
@@ -60,22 +64,32 @@ public class Sender implements Runnable {
             send("h=From:To:Subject:Date;");
 //            send("DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;");
             send(sendEmail.getSendFrom());
-            send(sendEmail.getTo());
+            send(sendEmail.getSendTo());
             send(sendEmail.getSubject());
+            send("Content-Type: multipart/alternative;");
+            send("boundary=\""+sendEmail.getEnd()+"\"");
+            send("MIME-Version: 1.0");
             send(sendEmail.getMessageId());
 
             //
-            send("boundary="+sendEmail.getEnd());
             //plain头部
+            send("");
+            send("--"+sendEmail.getEnd());
             send(sendEmail.getPlainType());
             send(sendEmail.getPlainBase64());
             //准备发送正文
             send("");
             send(sendEmail.getPlainText());
             send("");
-            send(sendEmail.getEnd());
+            send("--"+sendEmail.getEnd());
             //暂时不发送html内容
-//            send("");
+            send(sendEmail.getHtmlType());
+            send(sendEmail.getHtmlBase64());
+            send("");
+            send(sendEmail.getHtmlText());
+            send("");
+            send("--"+sendEmail.getEnd()+"--");
+            send("");
             send(".");
 //            send("");
             receive();
@@ -89,8 +103,8 @@ public class Sender implements Runnable {
         } finally {
             //处理结束逻辑
 
-            while (reader.available()>0) {
-                String line =in.nextLine();
+            while (reader.available() > 0) {
+                String line = in.nextLine();
 //                log.warn("server:"+line);
 //                System.out.println("server:" + line);
                 Thread.sleep(2000);
@@ -103,7 +117,7 @@ public class Sender implements Runnable {
     }
 
     private void send(String str) {
-//        System.out.println("Sender:" + str);
+        System.out.println("Sender:" + str);
         out.print(str.replaceAll("\n", "\r\n") + "\r\n");
         out.flush();
     }
@@ -117,7 +131,7 @@ public class Sender implements Runnable {
                 throw new RuntimeException(e);
             }
             if (in.hasNextLine()) {
-                String line =in.nextLine();
+                String line = in.nextLine();
 //                log.warn("server:"+line);
                 System.out.println("server:" + line);
             }

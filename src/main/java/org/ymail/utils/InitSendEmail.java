@@ -1,5 +1,6 @@
 package org.ymail.utils;
 
+import cn.hutool.core.bean.BeanUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.ymail.entity.Email;
@@ -24,11 +25,11 @@ public class InitSendEmail {
     public SendEmail initSendEmail(Email email) {
         //TODO:校验是否有unicode
         //全当unicode
-        SendEmail sendEmail = new SendEmail();
+        SendEmail sendEmail = BeanUtil.copyProperties(email,SendEmail.class);
         //初始化要发送的from
         sendEmail.setSendFrom(initFrom(email.getNickname(), email.getFrom()));
         //初始化To
-        sendEmail.setTo(initTo(email.getTo()));
+        sendEmail.setSendTo(initSendTo(email.getTo()));
         //初始化subject
         sendEmail.setSubject(initSubject(email.getSubject()));
         //初始化message-id
@@ -47,6 +48,10 @@ public class InitSendEmail {
         return sendEmail;
     }
 
+    private String initSendTo(String to) {
+        return "To: "+to;
+    }
+
     public static boolean ifHasUnicode(String str) {
         String regex = "\\p{L}";
         Matcher matcher = Pattern.compile(regex).matcher(str);
@@ -61,10 +66,6 @@ public class InitSendEmail {
                 "?=\" <" + str[1] + ">";
     }
 
-    private String initTo(String str) {
-        return "To: " + str;
-    }
-
     private String initSubject(String str) {
         String base64Str = baseUtils.getBase64(str);
         return "Subject: =?" + defaultCode + "?B?" + base64Str + "?=";
@@ -75,7 +76,7 @@ public class InitSendEmail {
     }
 
     private String initHtmlType() {
-        return "Content-Type: html/plain; charset=utf-8;";
+        return "Content-Type: text/html; charset=utf-8;";
     }
 
     private String initText(String str) {

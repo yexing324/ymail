@@ -9,31 +9,28 @@ public class EmailCheck {
 
     public static void checkEmailAndInit(Email email){
         //
-        String addr = checkFromAndGetAddr(email.getFrom());
+        checkFrom(email.getFrom());
         checkTo(email.getTo());
-        String nickName = getNickName(email.getFrom());
-        email.setNickname(nickName);
-        email.setFrom(addr);
         //subject可以为空，不检测
         if(email.getSubject()==null){
             email.setSubject("无主题");
         }
     }
-    public static String checkFromAndGetAddr(String str){
-        String emailAddr;
-        try {
-            //获得email的地址
-            emailAddr = getMesFromPattern(str, " <(.*?)>");
-        }catch (Exception e){
-            throw new RuntimeException("发件人email头部错误");
-        }
-        if(validate(emailAddr, "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")){
+    public static void checkFrom(String str){
+//        String emailAddr;
+//        try {
+//            //获得email的地址
+//            emailAddr = getMesFromPattern(str, " <(.*?)>");
+//        }catch (Exception e){
+//            throw new RuntimeException("发件人email头部错误");
+//        }
+        if(validate(str, "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")){
             throw new RuntimeException("发件人email地址错误");
         }
-        if(!str.trim().endsWith(">")){
-            throw new RuntimeException("发件人email头部错误");
-        }
-        return emailAddr;
+//        if(!str.trim().endsWith(">")){
+//            throw new RuntimeException("发件人email头部错误");
+//        }
+//        return emailAddr;
     }
     public static String getNickName(String str){
         String[] split = str.trim().split(" ");

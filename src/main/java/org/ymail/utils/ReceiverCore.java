@@ -20,7 +20,7 @@ public class ReceiverCore {
     private final BaseUtils baseUtils;
     public void startReceive() {
         try {
-            ServerSocket server = new ServerSocket(25);
+            ServerSocket server = new ServerSocket(28);
             System.out.println("服务器启动等待连接......");
             while (true) {
                 // 写日志文件

@@ -11,9 +11,13 @@ import lombok.ToString;
 @Data
 public class SendEmail extends Email {
     /**
-     * 真实的email地址
+     * 准备发送的from数据
      */
     String sendFrom;
+    /**
+     * 准备发送的to数据
+     */
+    String sendTo;
     /**
      * Message-ID
      */
@@ -39,7 +43,7 @@ public class SendEmail extends Email {
      * 结束标识
      * 暂定
      */
-    String end = "------=_Part_31565_1009936633.1705838186609";
+    String end = "----=_NextPart_65AD06B2_12B47D90_15F36F1D";
 
     @Override
     public String toString() {
