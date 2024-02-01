@@ -67,7 +67,7 @@ public class Sender implements Runnable {
             send(sendEmail.getSendTo());
             send(sendEmail.getSubject());
             send("Content-Type: multipart/alternative;");
-            send("boundary=\""+sendEmail.getEnd()+"\"");
+            send(" boundary=\""+sendEmail.getEnd()+"\"");
             send("MIME-Version: 1.0");
             send(sendEmail.getMessageId());
 

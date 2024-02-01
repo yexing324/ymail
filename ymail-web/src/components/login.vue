@@ -12,14 +12,12 @@
                   v-model="ruleForm2.username"
                   auto-complete="off"
                   placeholder="用户名"
+                  maxlength="10"
+                  show-word-limit
         ></el-input>
       </el-form-item>
       <el-form-item prop="password">
-        <el-input type="password"
-                  v-model="ruleForm2.password"
-                  auto-complete="off"
-                  placeholder="密码"
-        ></el-input>
+        <el-input placeholder="请输入密码" v-model="ruleForm2.password" show-password></el-input>
       </el-form-item>
       <el-form-item style="width:100%;">
         <el-button type="primary" style="width:100%;" @click="handleSubmit" :loading="logining">登录</el-button>
