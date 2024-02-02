@@ -45,11 +45,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
             <version>${mybatis-plus.version}</version>
@@ -81,7 +76,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>3.0.7</version>
                 <configuration>
-                    <mainClass>org.ymail.App</mainClass>
+                    <mainClass>org.ymail.AdminApp</mainClass>
                     <layout>ZIP</layout>
                 </configuration>
                 <executions>
