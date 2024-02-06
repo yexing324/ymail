@@ -31,6 +31,7 @@
 <script>
 import axios from "axios";
 import { ElMessage } from 'element-plus'
+import Cookies from "js-cookie";
 export default {
   data () {
     return {
@@ -50,7 +51,7 @@ export default {
     handleSubmit (event) {
       this.$refs.ruleForm2.validate((valid) => {
         if (valid) {
-          axios.post("/api/ymail/user/login",this.ruleForm2).then(
+          axios.post("/api/ymail/admin/login",this.ruleForm2).then(
               e=>{
                 let data=e.data
                 if(data.flag===false){
@@ -58,6 +59,10 @@ export default {
                 }else{
                   ElMessage.success("登录成功")
                   this.$router.push('/home')
+
+                  Cookies.set('cookie', data.data.cookie, { expires: 7, path: '' });
+                  Cookies.set('mail', data.data.mail, { expires: 7, path: '' });
+
                 }
               }
           )

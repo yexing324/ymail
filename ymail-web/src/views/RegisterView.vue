@@ -69,7 +69,7 @@ export default {
       this.$refs.registrationForm.validate((valid) => {
         if (valid) {
           // 表单验证通过，进行注册逻辑
-          axios.post("/api/ymail/user/register", this.form).then(e => {
+          axios.post("/api/ymail/admin/register", this.form).then(e => {
             if(e.data.flag===true){
               ElMessage.success("注册成功");
               //开始跳转

@@ -5,27 +5,40 @@ export default createStore({
     data : [
       {
         label: '收件箱',
-        categoryId: '1111111',
-        type: 'parent',
-        parentId: '0',
       },
       {
-        label: '发件箱',
-        categoryId: '22222222'
+        label: '星标邮件',
+      },
+      {
+        label: '草稿箱',
+      },
+      {
+        label: '已发送',
+      },
+
+      {
+        label: '待办邮件',
       },
       {
         label: '其他文件夹',
-        categoryId: '3333333333',
-        type: 'parent',
-        parentId: '0',
+        children: [
+           {
+            label: '已删除',
+          },
+          {
+            label: '垃圾箱',
+          },
+        ],
+      },
+      {
+        label: '附件管理',
         children: [
           {
-            label: '草稿箱',
-            categoryId: '3333333333-1',
-          }, {
-            label: '已删除',
-            categoryId: '3333333333-1',
-          }
+            label: '超大附件',
+          },
+          {
+            label: '邮箱附件',
+          },
         ],
       },
     ]

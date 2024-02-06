@@ -4,6 +4,7 @@ import HomeView from "@/views/HomeView.vue";
 import ReceiverBox from "@/components/ReceiverBox.vue";
 import RegisterView from "@/views/RegisterView.vue";
 import SentBox from "@/components/SentBox.vue";
+import HomeDefault from "@/components/HomeDefault.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -21,6 +22,10 @@ const routes: Array<RouteRecordRaw> = [
     name: 'home',
     component: HomeView,
     children: [
+        {
+            path: '',
+            component: HomeDefault
+        },
         {
             path: '/receiveBox',
             component: ReceiverBox
