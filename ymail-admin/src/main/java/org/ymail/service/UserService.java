@@ -6,4 +6,5 @@ import org.ymail.util.Result;
 public interface UserService {
     Result<Void> register(UserDo reqParam);
 
+    Result<String> login(UserDo reParam);
 }

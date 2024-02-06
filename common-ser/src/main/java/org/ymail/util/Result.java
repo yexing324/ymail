@@ -17,15 +17,6 @@ public class Result<T> implements Serializable {
     private static final long serialVersionUID = 5679018624309023727L;
 
     /**
-     * 正确返回码
-     */
-    public static final String SUCCESS_CODE = "200";
-    /**
-     * 错误返回码
-     */
-    public static final String FAIL_CODE = "500";
-
-    /**
      * 返回码
      */
     private String code;
@@ -72,6 +63,13 @@ public class Result<T> implements Serializable {
         return new Result<Void>()
                 .setFlag(t)
                 .setMessage(msg);
+    }
+
+    public static Result<Void> failure(String msg,String code){
+        return new Result<Void>()
+                .setFlag(false)
+                .setMessage(msg)
+                .setCode(code);
     }
 
 }

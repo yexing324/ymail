@@ -20,20 +20,25 @@ public class UserDo extends BaseDO {
     /**
      * 用户邮箱
      */
-    @NotBlank(message = "账号不能为空")
+    @NotBlank(message = "账号不能为空",groups = {Register.class,login.class})
     private String mail;
     /**
      * 密码
      */
-    @NotBlank(message = "密码不能为空")
+    @NotBlank(message = "密码不能为空",groups = {Register.class,login.class})
     private String password;
     /**
      * 手机号
      */
-    @NotBlank(message = "手机号不能为空")
+    @NotBlank(message = "手机号不能为空",groups = Register.class)
     private String phone;
     /**
      * vip
      */
     private String vipFlag;
+
+    /* 分组校验 */
+    public @interface Register {}
+    public @interface login {}
+
 }

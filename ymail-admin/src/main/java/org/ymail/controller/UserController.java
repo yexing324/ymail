@@ -1,14 +1,11 @@
 package org.ymail.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 import org.ymail.entity.UserDo;
 import org.ymail.service.UserService;
 import org.ymail.util.Result;
-
-import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,12 +13,12 @@ import javax.validation.Valid;
 public class UserController {
     private final UserService userService;
     @PostMapping("/login")
-    public Result<Void> login() {
-        return Result.success();
+    public Result<String> login(@Validated(UserDo.login.class) @RequestBody UserDo reParam) {
+        return userService.login(reParam);
     }
 
     @PostMapping("/register")
-    public Result<Void> register(@Valid UserDo reqParam) {
+    public Result<Void> register(@Validated(UserDo.Register.class) @RequestBody UserDo reqParam) {
         return userService.register(reqParam);
     }
 }
