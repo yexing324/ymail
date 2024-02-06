@@ -9,7 +9,7 @@
       <h3 class="title">系统登录</h3>
       <el-form-item prop="username">
         <el-input type="text"
-                  v-model="ruleForm2.username"
+                  v-model="ruleForm2.mail"
                   auto-complete="off"
                   placeholder="用户名"
                   maxlength="10"
@@ -21,22 +21,26 @@
       </el-form-item>
       <el-form-item style="width:100%;">
         <el-button type="primary" style="width:100%;" @click="handleSubmit" :loading="logining">登录</el-button>
+        <router-link to="/register">register</router-link>
+
       </el-form-item>
     </el-form>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+import { ElMessage } from 'element-plus'
 export default {
   data () {
     return {
       logining: false,
       ruleForm2: {
-        username: 'admin',
+        mail: 'admin',
         password: '123456'
       },
       rules2: {
-        username: [{required: true, message: '请输入账号', trigger: 'blur'}],
+        mail: [{required: true, message: '请输入账号', trigger: 'blur'}],
         password: [{required: true, message: '请输入密码', trigger: 'blur'}]
       },
       checked: false
@@ -46,18 +50,18 @@ export default {
     handleSubmit (event) {
       this.$refs.ruleForm2.validate((valid) => {
         if (valid) {
-          this.logining = true
-          if (this.ruleForm2.username === 'admin' &&
-              this.ruleForm2.password === '123456') {
-            this.logining = false
-            sessionStorage.setItem('user', this.ruleForm2.username)
-            this.$router.push({path: '/Menu'})
-          } else {
-            this.logining = false
-            this.$alert('username or password wrong!', 'info', {
-              confirmButtonText: 'ok'
-            })
-          }
+          axios.post("/api/ymail/user/login",this.ruleForm2).then(
+              e=>{
+                let data=e.data
+                if(data.flag===false){
+                  ElMessage.error(data.message)
+                }else{
+                  ElMessage.success("登录成功")
+                  this.$router.push('/home')
+                }
+              }
+          )
+          // axios.post("/api/ymail/admin/login",this.ruleForm2,{});
         } else {
           console.log('error submit!')
           return false
