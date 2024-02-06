@@ -10,6 +10,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.ymail.entity.UserDo;
 import org.ymail.mapper.UserMapper;
+import org.ymail.resp.UserResp;
 import org.ymail.service.UserService;
 import org.ymail.util.Regex;
 import org.ymail.util.Result;
@@ -67,7 +68,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Result<String> login(UserDo reParam) {
+    public Result<UserResp> login(UserDo reParam) {
         LambdaQueryWrapper<UserDo> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(UserDo::getPassword, reParam.getPassword());
         queryWrapper.eq(UserDo::getDelFlag, 0);
@@ -86,17 +87,19 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("账号或密码错误");
         }
         //查询redis
-        return Optional.of(userDo).map(u -> {
-            Boolean flag = stringRedisTemplate.hasKey("login_account:" + userDo.getMail());
-            if (Boolean.TRUE.equals(flag)) {//redis中已经包含该用户
-                Set<Object> keys = stringRedisTemplate.opsForHash().keys("login_account:" + userDo.getMail());
-                return Result.success(keys.iterator().next().toString());
-            }
-            //不包含
-            String token = UUID.randomUUID().toString();
-            stringRedisTemplate.opsForHash().put("login_account:" + userDo.getMail(), token, JSON.toJSONString(userDo));
-            stringRedisTemplate.expire("login_account:" + userDo.getMail(), 30L, TimeUnit.DAYS);
-            return Result.success(token);
-        }).orElseThrow(() -> new RuntimeException("用户不存在或者密码错误"));
+        Boolean flag = stringRedisTemplate.hasKey("login_account:" + userDo.getMail());
+        if (Boolean.TRUE.equals(flag)) {//redis中已经包含该用户
+            Set<Object> keys = stringRedisTemplate.opsForHash().keys("login_account:" + userDo.getMail());
+            UserResp userResp = UserResp.builder().mail(userDo.getMail()).cookie(keys.iterator().next().toString()).build();
+            return Result.success(userResp);
+        }
+        //不包含
+        String token = UUID.randomUUID().toString();
+        stringRedisTemplate.opsForHash().put("login_account:" + userDo.getMail(), token, JSON.toJSONString(userDo));
+        stringRedisTemplate.expire("login_account:" + userDo.getMail(), 30L, TimeUnit.DAYS);
+        UserResp userResp = UserResp.builder().mail(userDo.getMail()).cookie(token).build();
+        return Result.success(userResp);
     }
+
+
 }
