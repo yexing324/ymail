@@ -2,7 +2,6 @@ package org.ymail.entity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 /**
  * 发送邮件实体类

@@ -4,16 +4,12 @@ import com.alibaba.fastjson.JSON;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.ymail.entity.Email;
-import org.ymail.entity.SendEmail;
 import org.ymail.enums.EmailStatus;
 import org.ymail.mapper.EmailMapper;
-import org.ymail.mapper.SEmailMapper;
 import org.ymail.mq.MQProducer;
 import org.ymail.service.SendEmailService;
 import org.ymail.utils.EmailCheck;
 import org.ymail.utils.Result;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service

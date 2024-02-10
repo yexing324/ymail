@@ -28,7 +28,8 @@ public class UserTransmitFilter implements Filter {
     private final StringRedisTemplate stringRedisTemplate;
     private static final List<String> IGNORE_URI = List.of(
             "/ymail/admin/login",
-            "/ymail/admin/register"
+            "/ymail/admin/register",
+            "/ymail/upload/getImg"
     );
 
     @Override
