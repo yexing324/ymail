@@ -27,11 +27,11 @@ public class InitSendEmail {
         //全当unicode
         SendEmail sendEmail = BeanUtil.copyProperties(email,SendEmail.class);
         //初始化要发送的from
-        sendEmail.setSendFrom(initFrom(email.getNickname(), email.getFrom()));
+        sendEmail.setSendFrom(initFrom(sendEmail.getNickname(), sendEmail.getFrom()));
         //初始化To
-        sendEmail.setSendTo(initSendTo(email.getTo()));
+        sendEmail.setSendTo(initSendTo(sendEmail.getTo()));
         //初始化subject
-        sendEmail.setSubject(initSubject(email.getSubject()));
+        sendEmail.setSubject(initSubject(sendEmail.getSubject()));
         //初始化message-id
         sendEmail.setMessageId(initMessageId());
         //初始化plainTextType
@@ -41,9 +41,13 @@ public class InitSendEmail {
         //初始化编码与否
         sendEmail.setPlainBase64("Content-Transfer-Encoding: base64");
         sendEmail.setHtmlBase64("Content-Transfer-Encoding: base64");
+
+        //初始化图片相关信息
+        sendEmail.setHtmlText(initImage(sendEmail));
+
         //初始化plain&&html内容
-        sendEmail.setPlainText(initText(email.getPlainText()));
-        sendEmail.setHtmlText(initText(email.getHtmlText()));
+        sendEmail.setPlainText(initText(sendEmail.getPlainText()));
+        sendEmail.setHtmlText(initText(sendEmail.getHtmlText()));
 
         return sendEmail;
     }
@@ -89,6 +93,13 @@ public class InitSendEmail {
 
     private String initMessageId() {
         return "Message-ID: <" + UUID.randomUUID() + "@mail.jinnrry.com" + ">";
+    }
+
+    private String initImage(SendEmail sendEmail){
+        //TODO:应该用正则匹配
+        if (!sendEmail.getHtmlText().contains("<img ")) return sendEmail.getHtmlText();
+        //修改内部的imageList
+        return HtmlUtil.processHtml(sendEmail);
     }
 
 }

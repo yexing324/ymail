@@ -2,6 +2,7 @@ package org.ymail.utils;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.ymail.entity.Image;
 import org.ymail.entity.SendEmail;
 
 import java.io.*;
@@ -32,7 +33,9 @@ public class Sender implements Runnable {
     public void run() {
         //处理发送逻辑
         System.out.println("即将发送" + sendEmail);
-        sendEmail.setHtmlText("PGRpdiBzdHlsZT0iY29sb3I6cmVkIj7kvaDlpb08L2Rpdj4=");
+//        if (1 == 1)
+//            return;
+//        sendEmail.setHtmlText("PGRpdiBzdHlsZT0iY29sb3I6cmVkIj7kvaDlpb08L2Rpdj4=");
         //首先获得host
         try {
             host = sendEmail.getTo().split("@")[1];
@@ -66,30 +69,46 @@ public class Sender implements Runnable {
             send(sendEmail.getSendFrom());
             send(sendEmail.getSendTo());
             send(sendEmail.getSubject());
-            send("Content-Type: multipart/alternative;");
-            send(" boundary=\""+sendEmail.getEnd()+"\"");
+            send("Content-Type: multipart/related;");
+            send(" boundary=\"" + sendEmail.getEnd() + "\"");
             send("MIME-Version: 1.0");
             send(sendEmail.getMessageId());
-
+            send("--" + sendEmail.getEnd());
+            send("Content-Type: multipart/alternative;");
+            send(" boundary=\"" + sendEmail.getEnd1() + "\"");
             //
             //plain头部
             send("");
-            send("--"+sendEmail.getEnd());
+            send("--" + sendEmail.getEnd1());
             send(sendEmail.getPlainType());
             send(sendEmail.getPlainBase64());
             //准备发送正文
             send("");
             send(sendEmail.getPlainText());
             send("");
-            send("--"+sendEmail.getEnd());
+            send("--" + sendEmail.getEnd1());
             //暂时不发送html内容
             send(sendEmail.getHtmlType());
             send(sendEmail.getHtmlBase64());
             send("");
             send(sendEmail.getHtmlText());
             send("");
-            send("--"+sendEmail.getEnd()+"--");
+            send("--" + sendEmail.getEnd1() + "--");
+
+
             send("");
+            if(sendEmail.getImageList()!=null|| !sendEmail.getImageList().isEmpty()){
+                for (Image image:sendEmail.getImageList()){
+                    send("--" + sendEmail.getEnd());
+                    send("Content-Type: image/jpeg; ");
+                    send("Content-Transfer-Encoding: base64");
+                    send("Content-Disposition: inline;");
+                    send("Content-ID: <"+image.getImageId()+">");
+                    send(baseUtils.getImgFileToBase64(image.getName()));
+                    send("--" + sendEmail.getEnd() + "--");
+                }
+                //发送图片
+            }
             send(".");
 //            send("");
             receive();

@@ -14,6 +14,8 @@ public class SendController {
     @PostMapping("/sendEmail")
 
     public Result<Void> sendEmail(@RequestBody Email email){
+//        System.out.println(email);
+//        return new Result<>();
         return emailService.sendEmail(email);
     }
 }

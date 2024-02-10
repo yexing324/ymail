@@ -63,6 +63,21 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <dependency>
+            <!-- jsoup HTML parser library @ https://jsoup.org/ -->
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.15.3</version>
+        </dependency>
+<!--        MimeMultipart mimeMultipart=new MimeMultipart();-->
+<!--        或许是一个不错的选择，目前如果使用需要重构...-->
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.7</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>
@@ -72,7 +87,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>3.0.7</version>
                 <configuration>
-                    <mainClass>org.ymail.AdminApp</mainClass>
+                    <mainClass>org.ymail.CoreApp</mainClass>
                     <layout>ZIP</layout>
                 </configuration>
                 <executions>

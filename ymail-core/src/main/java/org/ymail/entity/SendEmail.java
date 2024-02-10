@@ -3,6 +3,8 @@ package org.ymail.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
+
 /**
  * 发送邮件实体类
  */
@@ -30,6 +32,10 @@ public class SendEmail extends Email {
      */
     String HtmlType;
     /**
+     * image list
+     */
+    List<Image> imageList;
+    /**
      * plain是否进行base编码
      * Content-Type-Transfer-Encoding
      */
@@ -43,6 +49,7 @@ public class SendEmail extends Email {
      * 暂定
      */
     String end = "----=_NextPart_65AD06B2_12B47D90_15F36F1D";
+    String end1 = "----=_NextPart_65AD06B3_12B47D90_15F36F1D";
 
     @Override
     public String toString() {
@@ -58,6 +65,7 @@ public class SendEmail extends Email {
                 ", subject='" + subject + '\'' +
                 ", plainText='" + plainText + '\'' +
                 ", htmlText='" + htmlText + '\'' +
+                ", imageList='" + imageList + '\'' +
                 ", status=" + status +
                 ", group='" + group + '\'' +
                 '}';
