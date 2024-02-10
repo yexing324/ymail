@@ -15,6 +15,14 @@ module.exports = defineConfig({
                 pathRewrite: {
                     '^/api': '/ymail'
                 }
+            },
+            "/core":{
+                target: 'http://127.0.0.1:81',
+                changeOrigin: true,
+                logLevel: 'debug',
+                pathRewrite: {
+                    '^/core': '/ymail'
+                }
             }
         }
     }

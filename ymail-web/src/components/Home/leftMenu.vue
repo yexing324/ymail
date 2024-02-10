@@ -13,6 +13,9 @@ onBeforeMount(() => {
   //初始化数据
 
 })
+const write=()=>{
+  router.push('/write')
+}
 const handleNodeClick = (e: { label: any; }) => {
   let label = e.label
   switch (label) {
@@ -36,15 +39,11 @@ const defaultProps = {
         <el-icon><MessageBox /></el-icon>
         收信
       </el-button>
-      <el-button type="primary" class="topItem">
+      <el-button type="primary" class="topItem" @click="write">
         <el-icon><EditPen /></el-icon>
         写信
       </el-button>
     <br/>
-
-
-    <!--    <span class="topItem">收信</span>-->
-    <!--    <span class="topItem">写信</span>-->
 
 
     <el-tree
