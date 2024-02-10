@@ -2,12 +2,14 @@
 import {onBeforeMount, toRaw} from "vue";
 import store from "@/store";
 import router from "@/router";
+import {EditPen, MessageBox} from "@element-plus/icons-vue";
 
-let data
+let menu1,menu2
 onBeforeMount(() => {
   //TODO:判断cookie状态
   //初始化菜单
-  data = toRaw(store.getters.getData)
+  menu1 = toRaw(store.getters.getMenu1)
+  menu2 = toRaw(store.getters.getMenu2)
   //初始化数据
 
 })
@@ -29,9 +31,15 @@ const defaultProps = {
 </script>
 
 <template>
-  <div style="height: 100vh;border-right: #c2d3f4 1px solid">
-      <el-button type="primary" class="topItem">收信</el-button>
-      <el-button type="primary" class="topItem">写信</el-button>
+  <div style="height: 100vh;border-right: #c2d3f4 1px solid;">
+      <el-button type="primary" class="topItem">
+        <el-icon><MessageBox /></el-icon>
+        收信
+      </el-button>
+      <el-button type="primary" class="topItem">
+        <el-icon><EditPen /></el-icon>
+        写信
+      </el-button>
     <br/>
 
 
@@ -40,8 +48,18 @@ const defaultProps = {
 
 
     <el-tree
+        style="margin-top:10px "
         highlight-current
-        :data="data"
+        :data="menu1"
+        :props="defaultProps"
+        @node-click="handleNodeClick">
+    </el-tree>
+
+    <el-divider style="margin:10px 10% 10px 10%;width: 80%"></el-divider>
+
+    <el-tree
+        style="margin-top:10px "
+        :data="menu2"
         :props="defaultProps"
         @node-click="handleNodeClick">
     </el-tree>
@@ -60,9 +78,20 @@ const defaultProps = {
   border-radius: 0;
   font-size: 18px;
   font-family: "等线",serif;
+  font-weight: bold;
   border-right: 0;
+  border-top:0;
   margin: 0;
+
 }
+
+.el-tree-node__label {
+  line-height:106px;
+}
+.el-tree-node{
+  margin-top: 60px;
+}
+
 
 .el-button--primary:hover {
   background: #d9e7ff;

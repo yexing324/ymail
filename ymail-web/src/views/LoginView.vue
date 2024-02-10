@@ -51,7 +51,7 @@ export default {
     handleSubmit (event) {
       this.$refs.ruleForm2.validate((valid) => {
         if (valid) {
-          axios.post("/api/ymail/admin/login",this.ruleForm2).then(
+          axios.post("/api/admin/login",this.ruleForm2).then(
               e=>{
                 let data=e.data
                 if(data.flag===false){

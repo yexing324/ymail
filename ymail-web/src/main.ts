@@ -7,7 +7,9 @@ import "./assets/css/common.css"
 import axios from 'axios'
 axios.defaults.withCredentials = true;
 
+
 const app = createApp(App)
+
 app.use(router)
 app.use(ElementPlus)
 app.mount('#app')

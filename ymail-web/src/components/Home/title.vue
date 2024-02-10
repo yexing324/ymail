@@ -19,7 +19,8 @@ export default defineComponent({
 
 
   </div>
-  <div class="line"></div>
+  <el-divider class="line"></el-divider>
+<!--  <div class="line"></div>-->
 </template>
 
 <style scoped>
@@ -36,13 +37,10 @@ export default defineComponent({
 
 /* 横线 */
 .line {
-  float: right;
   width: 100%;
   height: 2px;
-  margin-top: -0.5em;
   background: #b0c5ee;
-  position: relative;
-  text-align: center;
+  margin: 0;
 }
 
 </style>

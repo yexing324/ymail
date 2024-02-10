@@ -2,7 +2,7 @@ import { createStore } from 'vuex'
 
 export default createStore({
   state: {
-    data : [
+    menu1 : [
       {
         label: '收件箱',
       },
@@ -19,10 +19,12 @@ export default createStore({
       {
         label: '待办邮件',
       },
+    ],
+    menu2:[
       {
         label: '其他文件夹',
         children: [
-           {
+          {
             label: '已删除',
           },
           {
@@ -44,7 +46,8 @@ export default createStore({
     ]
   },
   getters: {
-    getData: state => state.data
+    getMenu1: state => state.menu1,
+    getMenu2: state => state.menu2
   },
   mutations: {
   },

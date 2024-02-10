@@ -1,16 +1,16 @@
 <template>
   <div style="display: flex;flex-direction:column;height: 100vh">
-    <div style="width: 100%;flex: 1">
+    <div style="width: 100%;">
 
       <Title @test="test"></Title>
 
     </div>
     <!-- 最上面设置结束-->
     <div style="display: flex;flex: 9;overflow: hidden">
+        <left-menu></left-menu>
 
-      <left-menu></left-menu>
       <!--内部将变成上下布局-->
-      <div>
+      <div style="padding: 10px">
         <router-view></router-view>
       </div>
 
