@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class Image {
+public class UploadFile {
     String name;
     String imageId;
     String imageType="Content-Type: image/jpeg;";

@@ -10,4 +10,5 @@ import lombok.ToString;
 public class UploadResp {
     int errno=0;
     String url;
+    String name;
 }

@@ -3,11 +3,27 @@ import '@wangeditor/editor/dist/css/style.css' // 引入 css
 import {Promotion} from "@element-plus/icons-vue";
 import {Editor, Toolbar} from "@wangeditor/editor-for-vue";
 import {onBeforeUnmount, onMounted, ref, shallowRef, toRaw} from "vue";
-import FormData from "form-data";
 import axios from "axios";
 
 
-let components= {Promotion, Editor, Toolbar}
+const fileList = ref([])
+
+const upload = (param) => {
+  const formData = new FormData()
+  formData.append('file', param.file)
+  const url = '/api/upload/attach'
+  axios.post(url, formData).then(data => {
+
+  }).catch(response => {
+    console.log("上传失败"+response)
+  })
+}
+
+const showFileList = () => {
+  console.log(toRaw(fileList.value))
+}
+
+let components = {Promotion, Editor, Toolbar}
 let editor;
 // 编辑器实例，必须用 shallowRef
 const editorRef = shallowRef()
@@ -23,7 +39,7 @@ onBeforeUnmount(() => {
 
 const handleCreated = (editorV) => {
   editorRef.value = editorV // 记录 editor 实例，重要！
-  editor=editorRef.value
+  editor = editorRef.value
   editor.setHtml("<p><span style=\"color: rgb(225, 60, 57);\">hello </span><span style=\"color: rgb(225, 60, 57);\"><strong>wor</strong></span><strong>ld</strong></p>")
 }
 
@@ -74,31 +90,27 @@ editorConfig.MENU_CONF['uploadImage'] = {
 }
 
 
-
-
-let data=ref({
-  nickname:'yexing',
-  to:'yexing195@163.com',
-  from:'123',
-  subject:'你好',
-  plainText:'',
-  htmlText:''
+let data = ref({
+  nickname: 'yexing',
+  to: 'yexing195@163.com',
+  from: '123',
+  subject: '你好',
+  plainText: '',
+  htmlText: '',
+  attachments:[]
 })
 
-let from="yexing@pmail.slovety.top"
+let from = "yexing@pmail.slovety.top"
 const send = () => {
-  data.value.from=from
-  data.value.htmlText=editor.getHtml()
-  data.value.plainText=editor.getText()
-  let req=toRaw(data.value);
-  axios.post("/core/sender/sendEmail",req).then(e=>{
+  data.value.from = from
+  data.value.htmlText = editor.getHtml()
+  data.value.plainText = editor.getText()
+  data.value.attachments=toRaw(fileList.value)
+  let req = toRaw(data.value);
+  axios.post("/core/sender/sendEmail", req).then(e => {
     console.log(e.data)
   })
 }
-
-
-
-
 
 
 </script>
@@ -116,6 +128,7 @@ const send = () => {
     <el-button plain>预览</el-button>
     <el-button plain>存草稿</el-button>
     <el-button plain>取消</el-button>
+    <el-button plain @click="showFileList">show</el-button>
   </div>
   <br/>
   <div style="display: flex">
@@ -138,6 +151,31 @@ const send = () => {
         show-word-limit
     />
   </div>
+  <br>
+
+
+  <!--  附件部分-->
+  <div style="display: flex;margin-left: 15px">
+    <el-upload
+        v-model:file-list="fileList"
+        multiple
+        action=""
+        class="upload-demo"
+        :http-request="upload"
+    >
+      <el-button type="primary">Click to upload</el-button>
+      <template #tip>
+        <div class="el-upload__tip">
+          jpg/png files with a size less than 500kb
+        </div>
+      </template>
+    </el-upload>
+  </div>
+
+
+  <!--  附件分割线-->
+
+
   <div style="border: 1px solid #ccc">
     <Toolbar
         style="border-bottom: 1px solid #ccc"

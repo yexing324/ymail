@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.ymail.entity.Email;
 import org.ymail.entity.SendEmail;
+import org.ymail.entity.Vo.EmailVo;
 
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -22,7 +23,7 @@ public class InitSendEmail {
     private final BaseUtils baseUtils;
     private final String defaultCode = "utf-8";
 
-    public SendEmail initSendEmail(Email email) {
+    public SendEmail initSendEmail(EmailVo email) {
         //TODO:校验是否有unicode
         //全当unicode
         SendEmail sendEmail = BeanUtil.copyProperties(email,SendEmail.class);

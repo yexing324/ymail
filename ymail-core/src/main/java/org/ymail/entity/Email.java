@@ -11,6 +11,7 @@ import java.util.Date;
  * 接收和发送实体类共用
  * 由于进行统一管理，放在一个表里面比较方便，可以分库分表
  */
+//TODO:附件对应表
 @TableName("t_email_from")
 @Data
 @ToString

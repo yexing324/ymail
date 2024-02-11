@@ -9,7 +9,8 @@ import java.nio.file.Files;
 import org.springframework.web.multipart.MultipartFile;
 @Service
 public class UploadServiceImpl implements UploadService {
-    private String imgAddress="D:\\img\\";
+    private String imgAddress="D:\\upload\\img\\";
+    private String fileAddress="D:\\upload\\file\\";
     @Override
     public byte[] getImg(String id) {
         String path = imgAddress + id + ".jpg";
@@ -37,6 +38,18 @@ public class UploadServiceImpl implements UploadService {
     public void upload(MultipartFile file) {
         String fileName = file.getOriginalFilename();
         File localFile = new File(imgAddress + fileName);
+        try {
+            file.transferTo(localFile);
+        } catch (Exception e) {
+            System.out.println("触发图片读写异常");
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void uploadAttach(MultipartFile file) {
+        String fileName = file.getOriginalFilename();
+        File localFile = new File(fileAddress + fileName);
         try {
             file.transferTo(localFile);
         } catch (Exception e) {

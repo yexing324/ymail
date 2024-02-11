@@ -1,7 +1,5 @@
 package org.ymail.controller;
 
-import com.alibaba.fastjson.JSON;
-import io.micrometer.core.instrument.binder.BaseUnits;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +12,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Base64;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,7 +23,6 @@ public class UploadController {
     public BufferedImage getImg(String id) throws IOException {
             return ImageIO.read(new FileInputStream(new File("D:\\img\\"+id)));
 //        byte[] img = uploadService.getImg(id);
-
     }
 
     @PostMapping("/setImg")
@@ -35,7 +31,19 @@ public class UploadController {
 //        return uploadResp;
         uploadService.upload(file);
         UploadResp uploadResp = new UploadResp();
+        uploadResp.setName(file.getOriginalFilename());
         uploadResp.setUrl("http://localhost/ymail/upload/getImg?id="+file.getOriginalFilename());
         return uploadResp;
     }
+    @PostMapping("/attach")
+    public UploadResp uploadAttach(@RequestParam("file") MultipartFile file) throws IOException {
+//        byte[] bytes = file.getBytes();
+//        return uploadResp;
+        uploadService.uploadAttach(file);
+        UploadResp uploadResp = new UploadResp();
+        uploadResp.setName(file.getOriginalFilename());
+        uploadResp.setUrl("http://localhost/ymail/upload/getfile?id="+file.getOriginalFilename());
+        return uploadResp;
+    }
+
 }

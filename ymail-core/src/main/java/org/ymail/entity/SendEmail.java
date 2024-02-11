@@ -2,6 +2,7 @@ package org.ymail.entity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.ymail.entity.Vo.EmailVo;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ import java.util.List;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SendEmail extends Email {
+public class SendEmail extends EmailVo {
     /**
      * 准备发送的from数据
      */
@@ -34,7 +35,7 @@ public class SendEmail extends Email {
     /**
      * image list
      */
-    List<Image> imageList;
+    List<UploadFile> uploadFileList;
     /**
      * plain是否进行base编码
      * Content-Type-Transfer-Encoding
@@ -60,14 +61,15 @@ public class SendEmail extends Email {
                 ", PlainBase64='" + PlainBase64 + '\'' +
                 ", HtmlBase64='" + HtmlBase64 + '\'' +
                 ", end='" + end + '\'' +
-                ", from='" + from + '\'' +
-                ", to='" + to + '\'' +
-                ", subject='" + subject + '\'' +
-                ", plainText='" + plainText + '\'' +
-                ", htmlText='" + htmlText + '\'' +
-                ", imageList='" + imageList + '\'' +
-                ", status=" + status +
-                ", group='" + group + '\'' +
+                ", from='" + getFrom() + '\'' +
+                ", to='" + getTo() + '\'' +
+                ", subject='" + getSubject() + '\'' +
+                ", plainText='" + getPlainText() + '\'' +
+                ", htmlText='" + getHtmlText() + '\'' +
+                ", imageList='" + uploadFileList + '\'' +
+                ", attachments='" + getAttachments() + '\'' +
+                ", status=" + getStatus() +
+                ", group='" + getGroup() + '\'' +
                 '}';
     }
 }

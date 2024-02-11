@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.ymail.entity.Email;
 import org.ymail.entity.SendEmail;
+import org.ymail.entity.Vo.EmailVo;
 import org.ymail.utils.BaseUtils;
 import org.ymail.utils.InitSendEmail;
 import org.ymail.utils.Sender;
@@ -26,7 +27,7 @@ public class MQConsumer {
     public class ConsumerSend implements RocketMQListener<String> {
         @Override
         public void onMessage(String msg) {
-            Email email = JSON.parseObject(msg, Email.class);
+            EmailVo email = JSON.parseObject(msg, EmailVo.class);
             //执行发送逻辑
             SendEmail sendEmail = initSendEmail.initSendEmail(email);
             //准备发送

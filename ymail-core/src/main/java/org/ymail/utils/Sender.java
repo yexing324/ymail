@@ -2,7 +2,7 @@ package org.ymail.utils;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.ymail.entity.Image;
+import org.ymail.entity.UploadFile;
 import org.ymail.entity.SendEmail;
 
 import java.io.*;
@@ -33,8 +33,8 @@ public class Sender implements Runnable {
     public void run() {
         //处理发送逻辑
         System.out.println("即将发送" + sendEmail);
-//        if (1 == 1)
-//            return;
+        if (1 == 1)
+            return;
 //        sendEmail.setHtmlText("PGRpdiBzdHlsZT0iY29sb3I6cmVkIj7kvaDlpb08L2Rpdj4=");
         //首先获得host
         try {
@@ -97,14 +97,14 @@ public class Sender implements Runnable {
 
 
             send("");
-            if(sendEmail.getImageList()!=null|| !sendEmail.getImageList().isEmpty()){
-                for (Image image:sendEmail.getImageList()){
+            if(sendEmail.getUploadFileList()!=null && !sendEmail.getUploadFileList().isEmpty()){
+                for (UploadFile uploadFile :sendEmail.getUploadFileList()){
                     send("--" + sendEmail.getEnd());
                     send("Content-Type: image/jpeg; ");
                     send("Content-Transfer-Encoding: base64");
                     send("Content-Disposition: inline;");
-                    send("Content-ID: <"+image.getImageId()+">");
-                    send(baseUtils.getImgFileToBase64(image.getName()));
+                    send("Content-ID: <"+ uploadFile.getImageId()+">");
+                    send(baseUtils.getImgFileToBase64(uploadFile.getName()));
                     send("--" + sendEmail.getEnd() + "--");
                 }
                 //发送图片

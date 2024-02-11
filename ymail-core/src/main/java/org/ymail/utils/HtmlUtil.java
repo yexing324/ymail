@@ -4,7 +4,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.ymail.entity.Image;
+import org.ymail.entity.UploadFile;
 import org.ymail.entity.SendEmail;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.UUID;
 public class HtmlUtil {
 
     public static String processHtml(SendEmail sendEmail) {
-        sendEmail.setImageList(new ArrayList<>());
+        sendEmail.setUploadFileList(new ArrayList<>());
 
         Document doc = Jsoup.parse(sendEmail.getHtmlText());
 
@@ -25,13 +25,13 @@ public class HtmlUtil {
 
         // 遍历处理
         for (Element imgTag : imgTags) {
-            Image image = new Image();
+            UploadFile uploadFile = new UploadFile();
             String imgSrc = imgTag.attr("src");
-            image.setUrl(imgSrc);
-            image.setName(imgSrc.substring(imgSrc.indexOf("=")+1));
+            uploadFile.setUrl(imgSrc);
+            uploadFile.setName(imgSrc.substring(imgSrc.indexOf("=")+1));
             String imageId="image-"+UUID.randomUUID();
-            image.setImageId(imageId);
-            sendEmail.getImageList().add(image);
+            uploadFile.setImageId(imageId);
+            sendEmail.getUploadFileList().add(uploadFile);
             // 替换src属性
             imgTag.attr("src", "cid:"+imageId);
 
