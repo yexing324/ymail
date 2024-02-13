@@ -35,7 +35,7 @@ public class SendEmail extends EmailVo {
     /**
      * image list
      */
-    List<UploadFile> uploadFileList;
+    List<UploadFile> imageList;
     /**
      * plain是否进行base编码
      * Content-Type-Transfer-Encoding
@@ -49,8 +49,10 @@ public class SendEmail extends EmailVo {
      * 结束标识
      * 暂定
      */
-    String end = "----=_NextPart_65AD06B2_12B47D90_15F36F1D";
-    String end1 = "----=_NextPart_65AD06B3_12B47D90_15F36F1D";
+    Integer type;
+    String mixBoundary = "----=_NextPart_65AD06B2_12B47D90_15F36F1D";
+    String relateBoundary = "----=_NextPart_65AD06B3_12B47D90_15F36F1D";
+    String alternativeBoundary = "----=_NextPart_65AD06B4_12B47D90_15F36F1D";
 
     @Override
     public String toString() {
@@ -60,13 +62,12 @@ public class SendEmail extends EmailVo {
                 ", HtmlType='" + HtmlType + '\'' +
                 ", PlainBase64='" + PlainBase64 + '\'' +
                 ", HtmlBase64='" + HtmlBase64 + '\'' +
-                ", end='" + end + '\'' +
                 ", from='" + getFrom() + '\'' +
                 ", to='" + getTo() + '\'' +
                 ", subject='" + getSubject() + '\'' +
                 ", plainText='" + getPlainText() + '\'' +
                 ", htmlText='" + getHtmlText() + '\'' +
-                ", imageList='" + uploadFileList + '\'' +
+                ", imageList='" + imageList + '\'' +
                 ", attachments='" + getAttachments() + '\'' +
                 ", status=" + getStatus() +
                 ", group='" + getGroup() + '\'' +

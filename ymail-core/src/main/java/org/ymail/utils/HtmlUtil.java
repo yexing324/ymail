@@ -16,7 +16,7 @@ import java.util.UUID;
 public class HtmlUtil {
 
     public static String processHtml(SendEmail sendEmail) {
-        sendEmail.setUploadFileList(new ArrayList<>());
+        sendEmail.setImageList(new ArrayList<>());
 
         Document doc = Jsoup.parse(sendEmail.getHtmlText());
 
@@ -31,7 +31,7 @@ public class HtmlUtil {
             uploadFile.setName(imgSrc.substring(imgSrc.indexOf("=")+1));
             String imageId="image-"+UUID.randomUUID();
             uploadFile.setImageId(imageId);
-            sendEmail.getUploadFileList().add(uploadFile);
+            sendEmail.getImageList().add(uploadFile);
             // 替换src属性
             imgTag.attr("src", "cid:"+imageId);
 
