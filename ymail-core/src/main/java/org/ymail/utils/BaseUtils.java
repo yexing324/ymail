@@ -80,8 +80,8 @@ public class BaseUtils {
     /**
      * imgFile 图片本地存储路径
      */
-    public String getImgFileToBase64(String imgFile) {
-        String addr="D:\\img\\"+imgFile;
+    public String getFileToBase64(String... file) {
+        String addr="D:\\upload\\"+file[1]+"\\"+file[0];
         //将图片文件转化为字节数组字符串，并对其进行Base64编码处理
         InputStream inputStream = null;
         byte[] buffer = null;

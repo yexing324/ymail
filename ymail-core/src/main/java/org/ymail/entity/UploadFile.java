@@ -11,13 +11,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UploadFile {
     String name;
-    String imageId;
-    String imageType="Content-Type: image/jpeg;";
-    String imagePosition="Content-Disposition: inline;";
+    String fileID;
+    String fileType="Content-Type: image/jpeg;";
+    String filePosition="Content-Disposition: inline;";
     String cid="Content-ID: <";
     String url;
 
     public String getCid() {
-        return cid+imageId+">";
+        return cid+fileID+">";
     }
 }

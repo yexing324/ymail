@@ -21,14 +21,11 @@ public class UploadController {
 
     @GetMapping(value = "/getImg",produces = MediaType.IMAGE_PNG_VALUE)
     public BufferedImage getImg(String id) throws IOException {
-            return ImageIO.read(new FileInputStream(new File("D:\\img\\"+id)));
-//        byte[] img = uploadService.getImg(id);
+            return ImageIO.read(new FileInputStream(new File("D:\\upload\\img\\"+id)));
     }
 
     @PostMapping("/setImg")
-    public UploadResp upload(@RequestParam("file") MultipartFile file) throws IOException {
-//        byte[] bytes = file.getBytes();
-//        return uploadResp;
+    public UploadResp upload(@RequestParam("file") MultipartFile file) {
         uploadService.upload(file);
         UploadResp uploadResp = new UploadResp();
         uploadResp.setName(file.getOriginalFilename());
@@ -36,9 +33,7 @@ public class UploadController {
         return uploadResp;
     }
     @PostMapping("/attach")
-    public UploadResp uploadAttach(@RequestParam("file") MultipartFile file) throws IOException {
-//        byte[] bytes = file.getBytes();
-//        return uploadResp;
+    public UploadResp uploadAttach(@RequestParam("file") MultipartFile file) {
         uploadService.uploadAttach(file);
         UploadResp uploadResp = new UploadResp();
         uploadResp.setName(file.getOriginalFilename());

@@ -11,6 +11,9 @@ import java.util.Scanner;
 
 import static org.ymail.enums.EmailType.*;
 
+/**
+ * 发送邮件的实际执行者
+ */
 @Slf4j
 public class Sender implements Runnable {
     public Sender(SendEmail email, BaseUtils baseUtils, String domain) {
@@ -21,24 +24,20 @@ public class Sender implements Runnable {
 
     private final BaseUtils baseUtils;
     private final SendEmail sendEmail;
-    private Scanner in;
+    private  Scanner in;
     private PrintWriter out;
-    private Socket server;
-    private String host;
-    private String domain;
-    private InputStream inputStream;
-    private OutputStream outputStream;
+    private final String domain;
     private DataInputStream reader;
+    private Socket server;
 
     @SneakyThrows
     @Override
     public void run() {
         //处理发送逻辑
         System.out.println("即将发送" + sendEmail);
-//        if (1 == 1)
-//            return;
+
         try {
-            host = sendEmail.getTo().split("@")[1];
+            String host = sendEmail.getTo().split("@")[1];
             //TODO:由于getHost会有一定的延迟
             //而mx地址并不常变，可以采用redis
             if (host.equals("163.com")) {
@@ -46,20 +45,21 @@ public class Sender implements Runnable {
             } else
                 host = baseUtils.getMailHost(host);
             server = new Socket(host, 25);
-            inputStream = server.getInputStream();
-            outputStream = server.getOutputStream();
+            InputStream inputStream = server.getInputStream();
+            OutputStream outputStream = server.getOutputStream();
             in = new Scanner(inputStream);
             out = new PrintWriter(outputStream);
             reader = new DataInputStream(inputStream);
             receive();
-            sendTitle();
 
+            sendTitle();
 
             send("DATA");
             receive();
-            sendFromAndToS();
-            sendType();
 
+            sendFromAndToS();
+
+            sendType();
 
 
             //开始正文
@@ -69,13 +69,10 @@ public class Sender implements Runnable {
                 send("MIME-Version: 1.0");
                 send(sendEmail.getMessageId());
 
+                send("");
                 send("--" + sendEmail.getMixBoundary());
-                send("Content-Type: multipart/related;");
-                send("");
-                send("This is a multi-part message in MIME format.");
-                send("");
+
                 sendRelated();
-                send("--" + sendEmail.getMixBoundary());
 
                 sendAttachments();
 
@@ -86,39 +83,44 @@ public class Sender implements Runnable {
 
             send("");
             send(".");
-//            send("");
             receive();
             send("QUIT");
             receive();
             //对数据库进行操作
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException("邮件发送失败");
             //TODO:发送失败逻辑
         } finally {
             //处理结束逻辑
             while (reader.available() > 0) {
                 String line = in.nextLine();
-//                log.warn("server:"+line);
-//                System.out.println("server:" + line);
                 Thread.sleep(2000);
             }
-
+            server.close();
             System.out.println("服务结束");
-//            server.close();
         }
 
     }
     private void sendAttachments(){
-
+        for (UploadFile file : sendEmail.getAttachments()) {
+            send("--" + sendEmail.getMixBoundary());
+            send("Content-Type: image/jpeg;\n        name="+file.getName());
+            send("Content-Transfer-Encoding: base64");
+            send("Content-Disposition: attachment;filename="+file.getName());
+            send("");
+            send(baseUtils.getFileToBase64(file.getName(),"file"));
+        }
     }
     private void sendRelated(){
+
         if (sendEmail.getImageList() != null && !sendEmail.getImageList().isEmpty()) {
             //有内嵌
+            send("Content-Type: multipart/related;");
             send("        boundary=\"" + sendEmail.getRelateBoundary() + "\"");
             send("");
+            send("This is a multi-part message in MIME format.");
+            send("");
             send("--" + sendEmail.getRelateBoundary());
-            send("Content-Type: multipart/alternative;");
             sendAlternative();
 
             sendImage();
@@ -134,16 +136,18 @@ public class Sender implements Runnable {
             send("Content-Type: image/jpeg;\n        name=123.jpg");
             send("Content-Transfer-Encoding: base64");
             send("Content-Disposition: inline;filename=123.jpg");
-            send("Content-ID: <" + uploadFile.getImageId() + ">");
+            send("Content-ID: <" + uploadFile.getFileID() + ">");
             send("");
-            send(baseUtils.getImgFileToBase64(uploadFile.getName()));
+            send(baseUtils.getFileToBase64(uploadFile.getName(),"img"));
         }
     }
     private void sendAlternative(){
+        send("Content-Type: multipart/alternative;");
         send("        boundary=\"" + sendEmail.getAlternativeBoundary() + "\"");
         //plain头部
         send("");
         send("--" + sendEmail.getAlternativeBoundary());
+
         send(sendEmail.getPlainType());
         send(sendEmail.getPlainBase64());
         //准备发送正文
@@ -216,7 +220,6 @@ public class Sender implements Runnable {
             }
             if (in.hasNextLine()) {
                 String line = in.nextLine();
-//                log.warn("server:"+line);
                 System.out.println("server:" + line);
             }
         } catch (Exception e) {

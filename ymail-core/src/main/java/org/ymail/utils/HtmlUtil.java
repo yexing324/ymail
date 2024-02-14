@@ -30,7 +30,7 @@ public class HtmlUtil {
             uploadFile.setUrl(imgSrc);
             uploadFile.setName(imgSrc.substring(imgSrc.indexOf("=")+1));
             String imageId="image-"+UUID.randomUUID();
-            uploadFile.setImageId(imageId);
+            uploadFile.setFileID(imageId);
             sendEmail.getImageList().add(uploadFile);
             // 替换src属性
             imgTag.attr("src", "cid:"+imageId);

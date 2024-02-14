@@ -53,7 +53,7 @@ public class UploadServiceImpl implements UploadService {
         try {
             file.transferTo(localFile);
         } catch (Exception e) {
-            System.out.println("触发图片读写异常");
+            System.out.println("触发文件读写异常");
             e.printStackTrace();
         }
     }
