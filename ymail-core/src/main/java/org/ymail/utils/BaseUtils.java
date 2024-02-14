@@ -107,7 +107,7 @@ public class BaseUtils {
             }
         }
         // 对字节数组Base64编码
-        return Base64.getEncoder().encodeToString(buffer);
+        return Base64.getMimeEncoder().encodeToString(buffer);
     }
 
 }

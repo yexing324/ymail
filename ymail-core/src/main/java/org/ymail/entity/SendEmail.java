@@ -50,9 +50,9 @@ public class SendEmail extends EmailVo {
      * 暂定
      */
     Integer type;
-    String mixBoundary = "----=_NextPart_65AD06B2_12B47D90_15F36F1D";
-    String relateBoundary = "----=_NextPart_65AD06B3_12B47D90_15F36F1D";
-    String alternativeBoundary = "----=_NextPart_65AD06B4_12B47D90_15F36F1D";
+    String mixBoundary = "----=_NextPart_65AD06B2_12B47D90_MIX";
+    String relateBoundary = "----=_NextPart_65AD06B3_12B47D90_RELATE";
+    String alternativeBoundary = "----=_NextPart_65AD06B4_12B47D90_ALTERNATIVE";
 
     @Override
     public String toString() {

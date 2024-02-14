@@ -2,10 +2,8 @@ package org.ymail.utils;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.ymail.entity.Email;
 import org.ymail.entity.UploadFile;
 import org.ymail.entity.SendEmail;
-import org.ymail.enums.EmailType;
 
 import java.io.*;
 import java.net.Socket;
@@ -39,8 +37,6 @@ public class Sender implements Runnable {
         System.out.println("即将发送" + sendEmail);
 //        if (1 == 1)
 //            return;
-//        sendEmail.setHtmlText("PGRpdiBzdHlsZT0iY29sb3I6cmVkIj7kvaDlpb08L2Rpdj4=");
-        //首先获得host
         try {
             host = sendEmail.getTo().split("@")[1];
             //TODO:由于getHost会有一定的延迟
@@ -69,12 +65,15 @@ public class Sender implements Runnable {
             //开始正文
             if(sendEmail.getType().equals(mixed.getValue())){
                 //复杂型
-                send(" boundary=\"" + sendEmail.getMixBoundary() + "\"");
+                send("        boundary=\"" + sendEmail.getMixBoundary() + "\"");
                 send("MIME-Version: 1.0");
                 send(sendEmail.getMessageId());
 
                 send("--" + sendEmail.getMixBoundary());
                 send("Content-Type: multipart/related;");
+                send("");
+                send("This is a multi-part message in MIME format.");
+                send("");
                 sendRelated();
                 send("--" + sendEmail.getMixBoundary());
 
@@ -116,12 +115,11 @@ public class Sender implements Runnable {
     private void sendRelated(){
         if (sendEmail.getImageList() != null && !sendEmail.getImageList().isEmpty()) {
             //有内嵌
-            send(" boundary=\"" + sendEmail.getRelateBoundary() + "\"");
-
+            send("        boundary=\"" + sendEmail.getRelateBoundary() + "\"");
+            send("");
             send("--" + sendEmail.getRelateBoundary());
             send("Content-Type: multipart/alternative;");
             sendAlternative();
-            send("");
 
             sendImage();
             send("--" + sendEmail.getRelateBoundary() + "--");
@@ -133,15 +131,16 @@ public class Sender implements Runnable {
     private void sendImage(){
         for (UploadFile uploadFile : sendEmail.getImageList()) {
             send("--" + sendEmail.getRelateBoundary());
-            send("Content-Type: image/jpeg; ");
+            send("Content-Type: image/jpeg;\n        name=123.jpg");
             send("Content-Transfer-Encoding: base64");
-            send("Content-Disposition: inline;");
+            send("Content-Disposition: inline;filename=123.jpg");
             send("Content-ID: <" + uploadFile.getImageId() + ">");
+            send("");
             send(baseUtils.getImgFileToBase64(uploadFile.getName()));
         }
     }
     private void sendAlternative(){
-        send(" boundary=\"" + sendEmail.getAlternativeBoundary() + "\"");
+        send("        boundary=\"" + sendEmail.getAlternativeBoundary() + "\"");
         //plain头部
         send("");
         send("--" + sendEmail.getAlternativeBoundary());
@@ -159,6 +158,7 @@ public class Sender implements Runnable {
         send(sendEmail.getHtmlText());
         send("");
         send("--" + sendEmail.getAlternativeBoundary() + "--");
+        send("");
     }
 
     private void sendTitle() {
@@ -201,7 +201,7 @@ public class Sender implements Runnable {
     }
 
     private void send(String str) {
-        System.out.println("Sender:" + str);
+        System.out.println(str);
         out.print(str.replaceAll("\n", "\r\n") + "\r\n");
         out.flush();
     }
