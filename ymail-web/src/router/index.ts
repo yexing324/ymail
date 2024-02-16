@@ -1,11 +1,12 @@
 import {createRouter, createWebHashHistory, RouteRecordRaw} from 'vue-router'
 import LoginView from "@/views/LoginView.vue";
 import HomeView from "@/views/HomeView.vue";
-import ReceiverBox from "@/components/ReceiverBox.vue";
+import ReceiverBox from "@/components/Home/ReceiverBox.vue";
 import RegisterView from "@/views/RegisterView.vue";
 import SentBox from "@/components/SentBox.vue";
 import HomeDefault from "@/components/HomeDefault.vue";
 import WriteMessage from "@/views/WriteMessage.vue";
+import ReadEmail from "@/components/Home/readEmail.vue";
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -38,6 +39,10 @@ const routes: Array<RouteRecordRaw> = [
             {
                 path: '/sentBox',
                 component: SentBox
+            },
+            {
+                path:'/emailDetail',
+                component:ReadEmail
             }
         ]
     },

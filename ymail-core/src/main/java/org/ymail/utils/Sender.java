@@ -115,7 +115,9 @@ public class Sender implements Runnable {
 
         if (sendEmail.getImageList() != null && !sendEmail.getImageList().isEmpty()) {
             //有内嵌
-            send("Content-Type: multipart/related;");
+            if(!sendEmail.getType().equals(related.getValue())){
+                send("Content-Type: multipart/related;");
+            }
             send("        boundary=\"" + sendEmail.getRelateBoundary() + "\"");
             send("");
             send("This is a multi-part message in MIME format.");

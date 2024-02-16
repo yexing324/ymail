@@ -27,14 +27,14 @@ public class ReceiveEmail extends Email {
                 "realFrom='" + realFrom + '\'' +
                 ", messageId='" + messageId + '\'' +
                 ", end='" + end + '\'' +
-                ", nickname='" + nickname + '\'' +
-                ", from='" + from + '\'' +
-                ", to='" + to + '\'' +
-                ", subject='" + subject + '\'' +
-                ", plainText='" + plainText + '\'' +
-                ", htmlText='" + htmlText + '\'' +
-                ", status=" + status +
-                ", group='" + group + '\'' +
+                ", nickname='" + getNickname() + '\'' +
+                ", from='" + getFrom() + '\'' +
+                ", to='" + getTo() + '\'' +
+                ", subject='" + getSubject() + '\'' +
+                ", plainText='" + getPlainText() + '\'' +
+                ", htmlText='" + getHtmlText() + '\'' +
+                ", status=" + getStatus() +
+                ", group='" + getGroup() + '\'' +
                 '}';
     }
 }

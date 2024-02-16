@@ -1,14 +1,11 @@
 package org.ymail.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.ymail.database.BaseDO;
-
-import java.util.Date;
 
 /**
  * 邮件实体类
@@ -20,6 +17,7 @@ import java.util.Date;
 @Data
 @ToString
 public class Email extends BaseDO {
+    String id;
     /**
      * from前面的昵称
      */

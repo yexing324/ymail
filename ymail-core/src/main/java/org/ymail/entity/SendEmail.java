@@ -2,7 +2,7 @@ package org.ymail.entity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.ymail.entity.Vo.EmailVo;
+import org.ymail.entity.Vo.EmailReq;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import java.util.List;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SendEmail extends EmailVo {
+public class SendEmail extends EmailReq {
     /**
      * 准备发送的from数据
      */

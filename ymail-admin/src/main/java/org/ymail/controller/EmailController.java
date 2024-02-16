@@ -1,9 +1,8 @@
 package org.ymail.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.ymail.resp.EmailResp;
 import org.ymail.service.EmailService;
 import org.ymail.util.Result;
 
@@ -16,5 +15,11 @@ public class EmailController {
     @GetMapping("/getMessage")
     public Result<Object> getMessage(){
         return emailService.getMessage();
+    }
+
+    @PostMapping("/readEmail")
+    public Result<EmailResp> readEmail(String emailId){
+        System.out.println(emailId);
+        return emailService.readEmail();
     }
 }

@@ -46,7 +46,7 @@
       class="scrollbar-for"
   >
     <!-- 内容部分 -->
-    <el-table :data="data.tableData" :show-header="false">
+    <el-table :data="data.tableData" :show-header="false" @rowClick="emailClick">
       <el-table-column type="selection" width="55"/>
       <el-table-column prop="nickname" label="发件人" width="150"/>
       <el-table-column prop="subject" label="主题" width="720"/>
@@ -60,12 +60,13 @@
 
 <script lang="ts" setup>
 
-import {onBeforeMount} from "vue";
+import {onBeforeMount, toRaw} from "vue";
 import axios from "axios";
 import {reactive} from "@vue/reactivity";
 import {ArrowDown, Check, CircleCheck, CirclePlus, CirclePlusFilled, Plus} from "@element-plus/icons-vue";
 import { ref } from 'vue'
 import type { DropdownInstance } from 'element-plus'
+import router from "@/router";
 
 const dropdown1 = ref<DropdownInstance>()
 const dropdown2 = ref<DropdownInstance>()
@@ -113,6 +114,15 @@ onBeforeMount(() => {
   })
 
 })
+const emailClick=(e: any)=>{
+  console.log()
+  router.push({
+    path:'/emailDetail',
+    query:{
+      id:toRaw(e).id
+    }
+  })
+}
 
 
 </script>

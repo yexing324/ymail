@@ -7,9 +7,8 @@ import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.ymail.entity.Email;
 import org.ymail.entity.SendEmail;
-import org.ymail.entity.Vo.EmailVo;
+import org.ymail.entity.Vo.EmailReq;
 import org.ymail.utils.BaseUtils;
 import org.ymail.utils.InitSendEmail;
 import org.ymail.utils.Sender;
@@ -27,7 +26,7 @@ public class MQConsumer {
     public class ConsumerSend implements RocketMQListener<String> {
         @Override
         public void onMessage(String msg) {
-            EmailVo email = JSON.parseObject(msg, EmailVo.class);
+            EmailReq email = JSON.parseObject(msg, EmailReq.class);
             //执行发送逻辑
             SendEmail sendEmail = initSendEmail.initSendEmail(email);
             //准备发送

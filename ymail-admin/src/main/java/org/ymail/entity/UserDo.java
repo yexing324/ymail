@@ -1,7 +1,6 @@
 package org.ymail.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.esotericsoftware.kryo.serializers.FieldSerializer.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

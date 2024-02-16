@@ -80,7 +80,7 @@ editorConfig.MENU_CONF['uploadImage'] = {
     var FormData = require("form-data");
     var data = new FormData();
     data.append("file", file); // file 即选中的文件
-    axios.post("/api/upload//setImg", data).then(e => {
+    axios.post("/api/upload/setImg", data).then(e => {
       let url = e.data.url
       insertFn(url)
     })

@@ -1,20 +1,16 @@
 package org.ymail.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import lombok.RequiredArgsConstructor;
-import org.apache.ibatis.jdbc.Null;
 import org.springframework.stereotype.Service;
-import org.ymail.database.BaseDO;
 import org.ymail.entity.Email;
 import org.ymail.filter.UserContext;
 import org.ymail.mapper.EmailMapper;
+import org.ymail.resp.EmailResp;
 import org.ymail.service.EmailService;
 import org.ymail.util.Result;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -42,5 +38,10 @@ public class EmailServiceImpl implements EmailService {
 
         List<Email> emails = emailMapper.selectList(queryWrapper);
         return Result.success(emails);
+    }
+
+    @Override
+    public Result<EmailResp> readEmail() {
+        return null;
     }
 }

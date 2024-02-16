@@ -3,8 +3,7 @@ package org.ymail.service.impl;
 import com.alibaba.fastjson.JSON;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.ymail.entity.Email;
-import org.ymail.entity.Vo.EmailVo;
+import org.ymail.entity.Vo.EmailReq;
 import org.ymail.enums.EmailStatus;
 import org.ymail.mapper.EmailMapper;
 import org.ymail.mq.MQProducer;
@@ -27,7 +26,7 @@ public class SendEmailServiceImpl implements SendEmailService {
      * @param email 邮件
      */
     @Override
-    public Result<Void> sendEmail(EmailVo email) {
+    public Result<Void> sendEmail(EmailReq email) {
         //此时传递可以影响到该email,直接在函数中修改即可
         EmailCheck.checkEmailAndInit(email);
         email.setStatus(EmailStatus.SEND_READY.getValue());

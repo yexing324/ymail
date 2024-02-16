@@ -1,5 +1,6 @@
 package org.ymail.service;
 
+import org.ymail.resp.EmailResp;
 import org.ymail.util.Result;
 
 public interface EmailService {
@@ -10,4 +11,6 @@ public interface EmailService {
      * @return 收件信息
      */
     Result<Object> getMessage();
+
+    Result<EmailResp> readEmail();
 }

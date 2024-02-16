@@ -9,7 +9,7 @@ import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class EmailVo extends Email {
+public class EmailReq extends Email {
     /**
      * 附件
      */
