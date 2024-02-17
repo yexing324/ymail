@@ -17,9 +17,8 @@ public class EmailController {
         return emailService.getMessage();
     }
 
-    @PostMapping("/readEmail")
+    @GetMapping("/readEmail")
     public Result<EmailResp> readEmail(String emailId){
-        System.out.println(emailId);
-        return emailService.readEmail();
+        return emailService.readEmail(emailId);
     }
 }

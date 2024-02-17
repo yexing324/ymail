@@ -12,5 +12,5 @@ public interface EmailService {
      */
     Result<Object> getMessage();
 
-    Result<EmailResp> readEmail();
+    Result<EmailResp> readEmail(String emailId);
 }

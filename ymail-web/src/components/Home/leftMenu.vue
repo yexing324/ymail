@@ -34,7 +34,7 @@ const defaultProps = {
 </script>
 
 <template>
-  <div style="height: 100vh;border-right: #c2d3f4 1px solid;">
+  <div style="height: 100vh;border-right: #c2d3f4 1px solid;text-align: left">
       <el-button type="primary" class="topItem">
         <el-icon><MessageBox /></el-icon>
         收信

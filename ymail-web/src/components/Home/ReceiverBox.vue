@@ -42,7 +42,7 @@
 
 
   <el-scrollbar
-      style="height: 100%;"
+      style="height: 100%;text-align: left"
       class="scrollbar-for"
   >
     <!-- 内容部分 -->
@@ -128,29 +128,7 @@ const emailClick=(e: any)=>{
 </script>
 <style>
 
-//滚动条设置
-::-webkit-scrollbar {
-  width: 8px;
-  height: 16px;
-  border-radius: 30px;
-}
 
-/*定义滚动条轨道
- 内阴影+圆角*/
-::-webkit-scrollbar-track {
-  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-  border-radius: 10px;
-  scrollbar-width: none;
-}
-
-/*定义滑块
- 内阴影+圆角*/
-::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
-  background-color: #f2f2f2;
-
-}
 .el-popper {
   overflow: auto;
 }

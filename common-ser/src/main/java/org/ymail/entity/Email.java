@@ -44,5 +44,9 @@ public class Email extends BaseDO {
      */
     @TableField("`group`")
     String group;
+    /**
+     * 附件id
+     */
+    String attachmentId;
 
 }
