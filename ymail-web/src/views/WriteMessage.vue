@@ -92,7 +92,7 @@ editorConfig.MENU_CONF['uploadImage'] = {
 
 let data = ref({
   nickname: 'yexing',
-  to: 'yexing195@163.com',
+  to: '2420233025@qq.com',
   from: '123',
   subject: '你好',
   plainText: '',
@@ -100,7 +100,7 @@ let data = ref({
   attachments:[]
 })
 
-let from = "yexing@pmail.slovety.top"
+let from = "yexing195@163.com"
 const send = () => {
   data.value.from = from
   data.value.htmlText = editor.getHtml()

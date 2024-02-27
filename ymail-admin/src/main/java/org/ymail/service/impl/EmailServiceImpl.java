@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.ymail.entity.Attachment;
 import org.ymail.entity.Email;
+import org.ymail.enums.EmailGroup;
 import org.ymail.enums.EmailStatus;
 import org.ymail.filter.UserContext;
 import org.ymail.mapper.AttachMapper;
@@ -15,8 +16,11 @@ import org.ymail.resp.EmailResp;
 import org.ymail.service.EmailService;
 import org.ymail.util.Result;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+
+import static org.ymail.enums.EmailStatus.READ_ALREADY;
+import static org.ymail.enums.EmailStatus.READ_NOT;
 
 @Service
 @RequiredArgsConstructor
@@ -41,10 +45,17 @@ public class EmailServiceImpl implements EmailService {
         LambdaQueryWrapper<Email>queryWrapper=new LambdaQueryWrapper<Email>()
                 .eq(Email::getTo,UserContext.getUserMail())
                 .eq(Email::getDelFlag,0)
+                .eq(Email::getGroup, EmailGroup.RECEIVE_BOX.getValue())
                 .orderByDesc(Email::getUpdateTime);
 
         List<Email> emails = emailMapper.selectList(queryWrapper);
-        return Result.success(emails);
+        List<EmailResp>res=new ArrayList<>();
+        emails.forEach(u->{
+            EmailResp emailResp= BeanUtil.copyProperties(u,EmailResp.class);
+            emailResp.setStatusText(EmailStatus.getValueByKey(emailResp.getStatus()));
+            res.add(emailResp);
+        });
+        return Result.success(res);
     }
 
     @Override
@@ -65,5 +76,104 @@ public class EmailServiceImpl implements EmailService {
         }
 
         return Result.success(emailResp);
+    }
+
+    @Override
+    public Result<Void> deleteEmail(List<Email> deleteEmail) {
+        if(deleteEmail.isEmpty()){
+            throw new RuntimeException("您还没有选中邮件");
+        }
+        try{
+            for (Email email:deleteEmail){
+                email.setDelFlag(1);
+                emailMapper.updateById(email);
+            }
+        }catch (Exception e){
+            return Result.failure("删除出现错误");
+        }
+
+        return Result.success();
+    }
+
+    @Override
+    public Result<Void> markRead(List<Email> markReadEmail) {
+        markReadEmail.forEach(item->{
+            item.setStatus(READ_ALREADY.getKey());
+            emailMapper.updateById(item);
+        });
+        return Result.success();
+    }
+
+    @Override
+    public Result<Void> markNotRead(List<Email> markNotReadEmail) {
+        markNotReadEmail.forEach(item->{
+            item.setStatus(READ_NOT.getKey());
+            emailMapper.updateById(item);
+        });
+        return Result.success();
+    }
+
+    @Override
+    public Result<Void> markAllRead() {
+        String userMail = UserContext.getUserMail();
+        LambdaQueryWrapper<Email>queryWrapper=new LambdaQueryWrapper<Email>()
+                .eq(Email::getDelFlag,0)
+                //TODO::判断当前登录者是否为邮件拥有者
+//                .eq(Email::getMaster,null)
+                .eq(Email::getTo,userMail);
+                //TODO::通过群组查询
+//                .eq(Email::getGroup,null);
+        Email email=new Email();
+        email.setStatus(READ_ALREADY.getKey());
+        emailMapper.update(email,queryWrapper);
+        return Result.success();
+    }
+
+    @Override
+    public Result<Object> getSendBox() {
+        LambdaQueryWrapper<Email>queryWrapper=new LambdaQueryWrapper<Email>()
+                .eq(Email::getMaster,UserContext.getUserMail())
+                .eq(Email::getDelFlag,0)
+                .eq(Email::getGroup, EmailGroup.SEND_BOX.getValue())
+                .orderByDesc(Email::getUpdateTime);
+
+        List<Email> emails = emailMapper.selectList(queryWrapper);
+        List<EmailResp>res=new ArrayList<>();
+        emails.forEach(u->{
+            EmailResp emailResp= BeanUtil.copyProperties(u,EmailResp.class);
+            emailResp.setStatusText(EmailStatus.getValueByKey(emailResp.getStatus()));
+            res.add(emailResp);
+        });
+        return Result.success(res);
+    }
+
+    @Override
+    public Result<Object> getEmailByGroup(String group) {
+        LambdaQueryWrapper<Email>queryWrapper=new LambdaQueryWrapper<Email>()
+                .eq(Email::getMaster,UserContext.getUserMail())
+                .eq(Email::getDelFlag,0)
+                .eq(Email::getGroup, group)
+                .orderByDesc(Email::getUpdateTime);
+
+        List<Email> emails = emailMapper.selectList(queryWrapper);
+        List<EmailResp>res=new ArrayList<>();
+        emails.forEach(u->{
+            EmailResp emailResp= BeanUtil.copyProperties(u,EmailResp.class);
+            emailResp.setStatusText(EmailStatus.getValueByKey(emailResp.getStatus()));
+            res.add(emailResp);
+        });
+        return Result.success(res);
+    }
+
+    @Override
+    public Result<Void> moveEmailGroup(List<Email>emails,String group) {
+       if(emails==null||emails.isEmpty()){
+           throw new RuntimeException("未选择邮件");
+       }
+       for(Email email:emails){
+           email.setGroup(group);
+           emailMapper.updateById(email);
+       }
+        return Result.success();
     }
 }

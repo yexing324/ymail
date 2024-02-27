@@ -4,9 +4,6 @@ import {defineComponent} from 'vue'
 export default defineComponent({
   name: "title",
   methods:{
-    test(){
-      this.$emit('test', true)
-    }
   }
 })
 </script>
@@ -15,7 +12,6 @@ export default defineComponent({
   <div style="display: flex;margin: 10px 0 10px 10px">
     <span class="ymail">YMail</span>
     <span class="freeMail">免费邮箱</span>
-    <button @click="test">按钮</button>
 
 
   </div>

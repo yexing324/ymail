@@ -21,6 +21,7 @@ public class Email extends BaseDO {
     /**
      * from前面的昵称
      */
+    String master;
     String nickname;
     @TableField("`from`")
     String from;

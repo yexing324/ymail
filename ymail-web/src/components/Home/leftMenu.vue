@@ -18,12 +18,53 @@ const write=()=>{
 }
 const handleNodeClick = (e: { label: any; }) => {
   let label = e.label
+  console.log(label)
   switch (label) {
     case "收件箱":
       router.push('/receiveBox')
       break;
     case "已发送":
-      router.push('/sentBox')
+      router.push('/sendBox')
+      break;
+    case "星标邮件":
+      router.push({
+        path:'/commonBox',
+        query:{
+          group:"星标邮件"
+        }
+      })
+      break;
+    case "草稿箱":
+      router.push({
+        path:'/commonBox',
+        query:{
+          group:"草稿箱"
+        }
+      })
+      break;
+    case "待办邮件":
+      router.push({
+        path:'/commonBox',
+        query:{
+          group:"待办邮件"
+        }
+      })
+      break;
+    case "已删除":
+      router.push({
+        path:'/commonBox',
+        query:{
+          group:"已删除"
+        }
+      })
+      break;
+    case "垃圾箱":
+      router.push({
+        path:'/commonBox',
+        query:{
+          group:"垃圾箱"
+        }
+      })
       break;
   }
 }

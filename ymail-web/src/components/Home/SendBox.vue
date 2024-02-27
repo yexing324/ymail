@@ -77,11 +77,11 @@
       </el-button>
       <template #dropdown>
         <el-dropdown-menu>
-          <el-dropdown-item @click="moveEmailGroup('草稿箱')">草稿箱</el-dropdown-item>
-          <el-dropdown-item @click="moveEmailGroup('已发送')">已发送</el-dropdown-item>
-          <el-dropdown-item @click="moveEmailGroup('已删除')">已删除</el-dropdown-item>
-          <el-dropdown-item @click="moveEmailGroup('垃圾邮件')">垃圾邮件</el-dropdown-item>
-          <el-dropdown-item @click="moveEmailGroup('')" divided>新建文件夹并移动</el-dropdown-item>
+          <el-dropdown-item>草稿箱</el-dropdown-item>
+          <el-dropdown-item>已发送</el-dropdown-item>
+          <el-dropdown-item>已删除</el-dropdown-item>
+          <el-dropdown-item>垃圾邮件</el-dropdown-item>
+          <el-dropdown-item divided>新建文件夹并移动</el-dropdown-item>
         </el-dropdown-menu>
       </template>
     </el-dropdown>
@@ -101,7 +101,6 @@
         :data="data.tableData"
         @rowClick="emailClick"
         @selection-change="select"
-        @contextmenu="showContextMenu()"
     >
       <el-table-column type="selection" width="30"/>
       <el-table-column width="50">
@@ -149,10 +148,6 @@ function showClick(e: any) {
   }
 
 }
-function showContextMenu() {
-  console.log(1)
-  document.onmousedown=click
-}
 
 
 let selectList: any;
@@ -160,20 +155,9 @@ const data = reactive({
   tableData: []
 })
 const getMessageList = () => {
-  axios.get("/api/email/getMessage").then(e => {
+  axios.get("/api/email/getSendBox").then(e => {
     if (e.data.flag === true) {
       data.tableData = e.data.data
-    }
-  })
-}
-const moveEmailGroup=(group:any)=>{
-  if(ifNotSelect()){
-    return
-  }
-  axios.post("/api/email/moveEmailGroup?group="+group,selectList).then(res=>{
-    if(res.data.flag==true){
-      ElMessage.success("移动成功")
-      getMessageList();
     }
   })
 }

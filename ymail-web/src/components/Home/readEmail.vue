@@ -113,7 +113,7 @@ onBeforeMount(() => {
           </div>
         </div>
 
-        <div v-html="data.email.htmlText" style="width: auto"></div>
+        <div v-html="data.email.htmlText" style="width: auto;min-height: 300px"></div>
 
 
         <el-input placeholder="快捷回复"/>

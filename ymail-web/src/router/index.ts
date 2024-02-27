@@ -3,10 +3,11 @@ import LoginView from "@/views/LoginView.vue";
 import HomeView from "@/views/HomeView.vue";
 import ReceiverBox from "@/components/Home/ReceiverBox.vue";
 import RegisterView from "@/views/RegisterView.vue";
-import SentBox from "@/components/SentBox.vue";
 import HomeDefault from "@/components/HomeDefault.vue";
 import WriteMessage from "@/views/WriteMessage.vue";
 import ReadEmail from "@/components/Home/readEmail.vue";
+import SendBox from "@/components/Home/SendBox.vue";
+import CommonBox from "@/components/Home/CommonBox.vue";
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -37,12 +38,16 @@ const routes: Array<RouteRecordRaw> = [
                 component: ReceiverBox
             },
             {
-                path: '/sentBox',
-                component: SentBox
+                path: '/sendBox',
+                component: SendBox
             },
             {
                 path:'/emailDetail',
                 component:ReadEmail
+            },
+            {
+                path:'/commonBox',
+                component:CommonBox
             }
         ]
     },
