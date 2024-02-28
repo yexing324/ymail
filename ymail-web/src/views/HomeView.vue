@@ -96,21 +96,24 @@ div {
 
 </style>
 
+
+
+
+
 <!--<template>-->
-<!--  <div style="height: 98vh; width: 100%;" v-menus:left="menus">-->
-<!--    <div class="div" v-menus:left="menus">指令方式打开菜单</div>-->
-<!--    <div class="div" @click.stop @contextmenu="($event) => $menusEvent($event, menus)">事件方式打开菜单</div>-->
-<!--    <div class="div" @click.stop @contextmenu="rightClick">组件方式打开菜单</div>-->
-<!--    <vue3-menus :open="isOpen" :event="eventVal" :menus="menus.menus">-->
-<!--      <template #icon="{menu, activeIndex, index}">{{activeIndex}}</template>-->
-<!--      <template #label="{ menu, activeIndex, index }">插槽：{{ menu.label }}</template>-->
-<!--    </vue3-menus>-->
+<!--  <div style="height: 98vh; width: 100%;" >-->
+<!--&lt;!&ndash;    <div class="div" v-menus:left="menus">指令方式打开菜单</div>&ndash;&gt;-->
+<!--&lt;!&ndash;    <div class="div" @click.stop @contextmenu="($event) => $menusEvent($event, menus)">事件方式打开菜单</div>&ndash;&gt;-->
+<!--&lt;!&ndash;    <div class="div" @click.stop @contextmenu="rightClick">组件方式打开菜单</div>&ndash;&gt;-->
+<!--&lt;!&ndash;    <vue3-menus :open="isOpen" :event="eventVal" :menus="menus.menus">&ndash;&gt;-->
+<!--&lt;!&ndash;      <template #icon="{menu, activeIndex, index}">{{activeIndex}}</template>&ndash;&gt;-->
+<!--&lt;!&ndash;      <template #label="{ menu, activeIndex, index }">插槽：{{ menu.label }}</template>&ndash;&gt;-->
+<!--&lt;!&ndash;    </vue3-menus>&ndash;&gt;-->
 <!--  </div>-->
 <!--</template>-->
+
 <!--<script>-->
 <!--import { defineComponent, nextTick, ref, shallowRef } from "vue";-->
-<!--import { SyncOutlined, WindowsOutlined, QrcodeOutlined } from '@ant-design/icons-vue';-->
-<!--import { Printer } from '@element-plus/icons'-->
 
 <!--export default defineComponent({-->
 <!--  name: "App",-->

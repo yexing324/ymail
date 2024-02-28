@@ -77,11 +77,11 @@
       </el-button>
       <template #dropdown>
         <el-dropdown-menu>
-          <el-dropdown-item @click="moveEmailGroup('草稿箱')">草稿箱</el-dropdown-item>
-          <el-dropdown-item @click="moveEmailGroup('已发送')">已发送</el-dropdown-item>
-          <el-dropdown-item @click="moveEmailGroup('已删除')">已删除</el-dropdown-item>
-          <el-dropdown-item @click="moveEmailGroup('垃圾邮件')">垃圾邮件</el-dropdown-item>
-          <el-dropdown-item @click="moveEmailGroup('')" divided>新建文件夹并移动</el-dropdown-item>
+          <el-dropdown-item>草稿箱</el-dropdown-item>
+          <el-dropdown-item>已发送</el-dropdown-item>
+          <el-dropdown-item>已删除</el-dropdown-item>
+          <el-dropdown-item>垃圾邮件</el-dropdown-item>
+          <el-dropdown-item divided>新建文件夹并移动</el-dropdown-item>
         </el-dropdown-menu>
       </template>
     </el-dropdown>
@@ -101,8 +101,6 @@
         :data="data.tableData"
         @rowClick="emailClick"
         @selection-change="select"
-        @contextmenu="rightClick"
-
     >
       <el-table-column type="selection" width="30"/>
       <el-table-column width="50">
@@ -116,11 +114,10 @@
       <el-table-column prop="nickname" label="发件人" width="150"/>
       <el-table-column prop="subject" label="主题" width="720"/>
       <el-table-column prop="updateTime" width="360"/>
-
-
     </el-table>
     <div style="height: 100px;margin-top: 50px">你好</div>
   </el-scrollbar>
+
 </template>
 
 
@@ -133,14 +130,15 @@ import {ArrowDown, Message} from "@element-plus/icons-vue";
 import {ref} from 'vue'
 import {DropdownInstance, ElMessage} from 'element-plus'
 import router from "@/router";
-import {shallowRef} from "vue";
-import {menusEvent} from 'vue3-menus';
+import route from "@/router";
 
 const dropdown1 = ref<DropdownInstance>()
 const dropdown2 = ref<DropdownInstance>()
 const table = ref()
 let reportVisible = ref()
 const reportList = ref(['', ''])
+
+let group;
 
 
 function showClick(e: any) {
@@ -160,27 +158,19 @@ const data = reactive({
   tableData: []
 })
 const getMessageList = () => {
-  axios.get("/api/email/getMessage").then(e => {
+  axios.get("/api/email/getSendBox").then(e => {
     if (e.data.flag === true) {
       data.tableData = e.data.data
-    }
-  })
-}
-const moveEmailGroup = (group: any) => {
-  if (ifNotSelect()) {
-    return
-  }
-  axios.post("/api/email/moveEmailGroup?group=" + group, selectList).then(res => {
-    if (res.data.flag == true) {
-      ElMessage.success("移动成功")
-      getMessageList();
     }
   })
 }
 
 
 onBeforeMount(() => {
-  getMessageList();
+  group = route.currentRoute.value.query.group
+  axios.get("/api/email/getEmailByGroup?group=" + group).then(res => {
+    data.tableData = res.data.data
+  })
 })
 const emailClick = (e: any) => {
   console.log()
@@ -222,8 +212,7 @@ function deleteEmail() {
 function select(e: any) {
   selectList = toRaw(e)
 }
-
-function ifNotSelect() {
+function ifNotSelect(){
   if (selectList == null || selectList.length == 0) {
     ElMessage.warning("您还没有选中")
     return true
@@ -231,13 +220,13 @@ function ifNotSelect() {
   return false
 }
 
-function markRead() {
-  if (ifNotSelect()) {
+function markRead(){
+  if(ifNotSelect()){
     return
   }
   for (let i = 0; i < selectList.length; i++) {
-    if (selectList[i].statusText != "已读") {
-      axios.post("/api/email/markRead", selectList).then(res => {
+    if(selectList[i].statusText!="已读"){
+      axios.post("/api/email/markRead",selectList).then(res=>{
         ElMessage.success("标记成功")
         getMessageList()
       })
@@ -247,22 +236,20 @@ function markRead() {
   ElMessage.warning("您选择的都是已读，请重新选择")
 
 }
-
-function markAllRead() {
-  axios.post("/api/email/markAllRead").then(res => {
+function markAllRead(){
+  axios.post("/api/email/markAllRead").then(res=>{
     ElMessage.success("标记成功")
     getMessageList()
   })
 
 }
-
-function markNotRead() {
-  if (ifNotSelect()) {
+function markNotRead(){
+  if(ifNotSelect()){
     return
   }
   for (let i = 0; i < selectList.length; i++) {
-    if (selectList[i].statusText != "未读") {
-      axios.post("/api/email/markNotRead", selectList).then(res => {
+    if(selectList[i].statusText!="未读"){
+      axios.post("/api/email/markNotRead",selectList).then(res=>{
         ElMessage.success("标记成功")
         getMessageList()
       })
@@ -272,55 +259,6 @@ function markNotRead() {
   ElMessage.warning("您选择的都是未读，请重新选择")
 
 }
-
-
-
-
-function rightClick(event: any) {
-  const target = event.target;
-  const header = target.closest('.el-table__header');
-  if (header) {
-    //不执行
-  } else {
-    menusEvent(event, menus.value, 1);
-    event.preventDefault();
-  }
-}
-
-const menus = shallowRef({
-  menus: [
-    {
-      label: "设置待办",
-      click: () => {
-        window.history.back();
-      }
-    },
-    {
-      label: "设为未读",
-      click: () => {
-        return false;
-      }
-    },
-    {
-      label: "置顶邮件",
-      disabled: true
-    },
-    {
-      label: "添加备注",
-      click: () => location.reload(),
-      divided: true
-    },
-    {
-      label: "删除邮件",
-    },
-    {
-      label: "举报垃圾邮件",
-      click: () => window.print(),
-    }
-  ]
-})
-
-
 
 
 </script>
