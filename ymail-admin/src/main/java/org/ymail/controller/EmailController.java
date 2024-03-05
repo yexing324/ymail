@@ -1,12 +1,15 @@
 package org.ymail.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.springframework.web.bind.annotation.*;
 import org.ymail.entity.Email;
+import org.ymail.entity.EmailReport;
 import org.ymail.resp.EmailResp;
 import org.ymail.service.EmailService;
 import org.ymail.util.Result;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -56,5 +59,10 @@ public class EmailController {
     @PostMapping("/moveEmailGroup")
     public Result<Void> moveGroup(@RequestBody List<Email> moveEmailGroup, String group){
         return emailService.moveEmailGroup(moveEmailGroup,group);
+    }
+
+    @PostMapping("/reportEmail")
+    public Result<Void> reportEmail(@RequestBody List<Email> emails,String reason){
+        return emailService.reportEmail(emails,reason);
     }
 }

@@ -9,11 +9,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.ymail.entity.Attachment;
 import org.ymail.entity.Email;
+import org.ymail.entity.EmailReport;
 import org.ymail.enums.EmailGroup;
 import org.ymail.enums.EmailStatus;
 import org.ymail.filter.UserContext;
 import org.ymail.mapper.AttachMapper;
 import org.ymail.mapper.EmailMapper;
+import org.ymail.mapper.EmailReportMapper;
 import org.ymail.resp.EmailResp;
 import org.ymail.service.EmailService;
 import org.ymail.util.Result;
@@ -30,6 +32,7 @@ import static org.ymail.enums.EmailStatus.READ_NOT;
 public class EmailServiceImpl implements EmailService {
     private final EmailMapper emailMapper;
     private final AttachMapper attachMapper;
+    private final EmailReportMapper emailReportMapper;
     /**
      * 获得用户登录时的具体信息
      * @return 信息
@@ -203,6 +206,17 @@ public class EmailServiceImpl implements EmailService {
            email.setGroup(group);
            emailMapper.updateById(email);
        }
+        return Result.success();
+    }
+
+    @Override
+    public Result<Void> reportEmail(List<Email> emails,String reason) {
+        for (Email email:emails){
+            EmailReport emailReport=new EmailReport();
+            emailReport.setEmailId(email.getId());
+            emailReport.setReason(reason);
+            emailReportMapper.insert(emailReport);
+        }
         return Result.success();
     }
 }

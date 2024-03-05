@@ -11,28 +11,28 @@
       <h3 class="report">您举报的邮件类型为:</h3>
     </template>
     <template #default>
-      <el-checkbox-group v-model="reportList">
+      <el-radio-group v-model="report">
         <div class="report">
-          <el-checkbox label="仿冒邮件（仿冒各类通知）"/>
-          <el-checkbox label="色情邮件"/>
+          <el-radio label="仿冒邮件（仿冒各类通知）"/>
+          <el-radio label="色情邮件"/>
         </div>
         <div class="report">
-          <el-checkbox label="钓鱼邮件（诱导骗取信息）"/>
-          <el-checkbox label="违法邮件"/>
+          <el-radio label="钓鱼邮件（诱导骗取信息）"/>
+          <el-radio label="违法邮件"/>
         </div>
         <div class="report">
-          <el-checkbox label="代开发票"/>
-          <el-checkbox label="广告推广"/>
-          <el-checkbox label="其他邮件"/>
+          <el-radio label="代开发票"/>
+          <el-radio label="广告推广"/>
+          <el-radio label="其他邮件"/>
         </div>
-      </el-checkbox-group>
+      </el-radio-group>
     </template>
 
 
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="reportVisible = false">取消</el-button>
-        <el-button type="primary" @click="reportVisible = false">
+        <el-button type="primary" @click="reportSubmit()">
           提交
         </el-button>
       </div>
@@ -198,9 +198,32 @@ const dropdown2 = ref<DropdownInstance>()
 const dropdown3 = ref<DropdownInstance>()
 const table = ref()
 let reportVisible = ref()
-const reportList = ref(['', ''])
+const report = ref()
 const currentRightClick = ref()
 let group: any;
+let isRightReport=ref(false)
+
+function reportSubmit() {
+  if (report.value == null || report.value == "") {
+
+    ElMessage.warning("您没有选择原因")
+    return
+  }
+  //默认选择列表
+  reportVisible.value = false
+  let formData = []
+  if (isRightReport.value) {
+    isRightReport.value = false
+    formData.push(currentRightClick.value)
+  } else {
+    formData = selectList
+  }
+  axios.post("/api/email/reportEmail?reason=" + report.value, formData).then(res => {
+    if (res.data.flag == true) {
+      ElMessage.success("举报成功，我们将尽快给您反馈")
+    }
+  })
+}
 
 function refresh() {
   getMessageList(true)
@@ -237,7 +260,6 @@ let size = ref(20)
 
 
 function getMessageList(flag = false, page = 1, size = 20) {
-  console.log(flag, page, size)
   axios.get("/api/email/getEmailByGroup?group=" + group + "&page=" + page + "&size=" + size).then(res => {
     if (res.data.flag === true) {
       ({records: data.tableData} = res.data.data);
@@ -269,7 +291,6 @@ onBeforeMount(() => {
 })
 
 const emailClick = (e: any) => {
-  console.log()
   router.push({
     path: '/emailDetail',
     query: {
@@ -444,6 +465,7 @@ const menus = shallowRef({
           ElMessage.warning("您还没有选择哦")
           return
         }
+        isRightReport.value = true;
         reportVisible.value = true
       }
     }

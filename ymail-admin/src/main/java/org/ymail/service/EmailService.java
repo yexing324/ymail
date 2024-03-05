@@ -1,6 +1,7 @@
 package org.ymail.service;
 
 import org.ymail.entity.Email;
+import org.ymail.entity.EmailReport;
 import org.ymail.resp.EmailResp;
 import org.ymail.util.Result;
 
@@ -30,4 +31,6 @@ public interface EmailService {
     Result<Object> getEmailByGroup(String group,int page,int size);
 
     Result<Void> moveEmailGroup(List<Email>emails,String group);
+
+    Result<Void> reportEmail(List<Email> email,String reason);
 }
