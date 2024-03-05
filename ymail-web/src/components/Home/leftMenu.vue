@@ -21,7 +21,12 @@ const handleNodeClick = (e: { label: any; }) => {
   console.log(label)
   switch (label) {
     case "收件箱":
-      router.push('/receiveBox')
+      router.push({
+        path:'/commonBox',
+        query:{
+          group:"收件箱"
+        }
+      })
       break;
     case "已发送":
       router.push('/sendBox')

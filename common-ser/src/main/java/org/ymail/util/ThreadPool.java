@@ -1,11 +1,11 @@
-package org.ymail.utils;
+package org.ymail.util;
 
 import lombok.NonNull;
-import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 @Component
 public class ThreadPool {

@@ -12,7 +12,7 @@ import org.ymail.entity.Vo.EmailReq;
 import org.ymail.utils.BaseUtils;
 import org.ymail.utils.InitSendEmail;
 import org.ymail.utils.Sender;
-import org.ymail.utils.ThreadPool;
+import org.ymail.util.ThreadPool;
 
 @Slf4j
 @Component

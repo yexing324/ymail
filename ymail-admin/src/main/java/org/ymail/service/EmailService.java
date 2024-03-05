@@ -27,7 +27,7 @@ public interface EmailService {
 
     Result<Object> getSendBox();
 
-    Result<Object> getEmailByGroup(String group);
+    Result<Object> getEmailByGroup(String group,int page,int size);
 
     Result<Void> moveEmailGroup(List<Email>emails,String group);
 }

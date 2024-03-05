@@ -40,60 +40,101 @@
   </el-dialog>
 
 
-  <div style="display: flex">
-    <el-button @click="deleteEmail" text class="btn"
-               style="  border: 1px solid #b7bcc7; font-size: 13px;width: 60px">删 除
-    </el-button>
-    <el-button @click="reportEmail" text class="btn"
-               style="  border: 1px solid #b7bcc7; font-size: 13px;width: 60px">举 报
-    </el-button>
+  <div style="overflow:hidden;">
+    <!--    左边的按钮簇-->
+    <div style="float: left">
+      <el-button @click="deleteEmail" text class="btn"
+                 style="  border: 1px solid #b7bcc7; font-size: 13px;width: 60px">删 除
+      </el-button>
+      <el-button @click="reportEmail" text class="btn"
+                 style="  border: 1px solid #b7bcc7; font-size: 13px;width: 60px">举 报
+      </el-button>
 
-    <el-dropdown ref="dropdown1" trigger="contextmenu" style="margin-left: 12px">
-      <el-button @click="showClick(1)" text class="btn"
-                 style="  border: 1px solid #b7bcc7; font-size: 13px;width: 80px">
-        标记为
-        <el-icon>
-          <arrow-down/>
+      <el-dropdown ref="dropdown1" trigger="contextmenu" style="margin-left: 12px">
+        <el-button @click="showClick(1)" text class="btn"
+                   style="  border: 1px solid #b7bcc7; font-size: 13px;width: 80px">
+          标记为
+          <el-icon>
+            <arrow-down/>
+          </el-icon>
+        </el-button>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item @click="markRead">已读</el-dropdown-item>
+            <el-dropdown-item @click="markNotRead">未读</el-dropdown-item>
+            <el-dropdown-item @click="markAllRead">全部设置为已读</el-dropdown-item>
+            <el-dropdown-item disabled>待办邮件</el-dropdown-item>
+            <el-dropdown-item disabled>标记邮件</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+
+      <el-dropdown ref="dropdown2" trigger="contextmenu" style="margin-left: 12px">
+        <el-button @click="showClick(2)" text class="btn"
+                   style="  border: 1px solid #b7bcc7; font-size: 13px;width: 80px">
+          移动到
+          <el-icon>
+            <arrow-down/>
+          </el-icon>
+        </el-button>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item @click="moveEmailGroup('草稿箱')">草稿箱</el-dropdown-item>
+            <el-dropdown-item @click="moveEmailGroup('已发送')">已发送</el-dropdown-item>
+            <el-dropdown-item @click="moveEmailGroup('已删除')">已删除</el-dropdown-item>
+            <el-dropdown-item @click="moveEmailGroup('垃圾邮件')">垃圾邮件</el-dropdown-item>
+            <el-dropdown-item @click="moveEmailGroup('')" divided>新建文件夹并移动</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+
+      <el-button @click="refresh" text
+                 style=" border: 1px solid #b7bcc7; font-size: 13px;width: 60px;margin-left: 13px">
+        刷新
+      </el-button>
+    </div>
+    <!--    右边的按钮簇-->
+    <div style="float: right">
+      <el-dropdown ref="dropdown3" trigger="contextmenu" style="margin-left: 12px;">
+        <el-button @click="showClick(3)" text class="btn"
+                   style="  border: 0 solid #b7bcc7; font-size: 13px;width: 80px;margin-right: 5px;">
+          {{ currentPage }}/{{ pages }}&nbsp;&nbsp;
+          <el-icon>
+            <arrow-down/>
+          </el-icon>
+        </el-button>
+        <template #dropdown>
+          <el-dropdown-menu v-for="index in pages" style="width: 150px">
+            <el-dropdown-item @click="getMessageList(false,index,size)">{{ index }}/{{ pages }}</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+
+      <el-button-group style="margin-top: 0px;">
+        <el-button style="border-radius:20px 0 0 20px" @click="pageChange(-1)" :disabled="currentPage==1"
+                   :icon="ArrowLeft"></el-button>
+        <el-button style="border-radius:0 20px 20px 0" @click="pageChange(+1)" :disabled="currentPage==pages">
+          <el-icon class="el-icon--right">
+            <ArrowRight/>
+          </el-icon>
+        </el-button>
+      </el-button-group>
+      &nbsp;
+
+      <el-button style="border-radius: 60px;border: 1px solid grey;width: 20px;margin-right: 5px;">
+        <el-icon size="20px">
+          <Setting/>
         </el-icon>
       </el-button>
-      <template #dropdown>
-        <el-dropdown-menu>
-          <el-dropdown-item @click="markRead">已读</el-dropdown-item>
-          <el-dropdown-item @click="markNotRead">未读</el-dropdown-item>
-          <el-dropdown-item @click="markAllRead">全部设置为已读</el-dropdown-item>
-          <el-dropdown-item disabled>待办邮件</el-dropdown-item>
-          <el-dropdown-item disabled>标记邮件</el-dropdown-item>
-        </el-dropdown-menu>
-      </template>
-    </el-dropdown>
 
-    <el-dropdown ref="dropdown2" trigger="contextmenu" style="margin-left: 12px">
-      <el-button @click="showClick(2)" text class="btn"
-                 style="  border: 1px solid #b7bcc7; font-size: 13px;width: 80px">
-        移动到
-        <el-icon>
-          <arrow-down/>
-        </el-icon>
-      </el-button>
-      <template #dropdown>
-        <el-dropdown-menu>
-          <el-dropdown-item>草稿箱</el-dropdown-item>
-          <el-dropdown-item>已发送</el-dropdown-item>
-          <el-dropdown-item>已删除</el-dropdown-item>
-          <el-dropdown-item>垃圾邮件</el-dropdown-item>
-          <el-dropdown-item divided>新建文件夹并移动</el-dropdown-item>
-        </el-dropdown-menu>
-      </template>
-    </el-dropdown>
+    </div>
 
-    <el-button text style=" border: 1px solid #b7bcc7; font-size: 13px;width: 60px;margin-left: 13px">刷新</el-button>
 
   </div>
 
 
   <el-scrollbar
-      style="height: 100%;text-align: left"
-      class="scrollbar-for"
+      style="height: 100%;text-align: center"
   >
     <!-- 内容部分 -->
     <el-table
@@ -101,7 +142,11 @@
         :data="data.tableData"
         @rowClick="emailClick"
         @selection-change="select"
+        @row-contextmenu="row_rightClick($event)"
+        @contextmenu="rightClick($event)"
+        style="min-height: 500px;text-align: left"
     >
+
       <el-table-column type="selection" width="30"/>
       <el-table-column width="50">
         <template #default="{ row }">
@@ -114,9 +159,23 @@
       <el-table-column prop="nickname" label="发件人" width="150"/>
       <el-table-column prop="subject" label="主题" width="720"/>
       <el-table-column prop="updateTime" width="360"/>
+
     </el-table>
-    <div style="height: 100px;margin-top: 50px">你好</div>
+    <div style="height: 100px;margin-top: 20px">
+      <el-button-group>
+        <el-button @click="pageChange(-1)" :disabled="currentPage==1" :icon="ArrowLeft">上一页</el-button>
+        <el-button @click="pageChange(+1)" :disabled="currentPage==pages">
+          下一页
+          <el-icon class="el-icon--right">
+            <ArrowRight/>
+          </el-icon>
+        </el-button>
+      </el-button-group>
+    </div>
+
+
   </el-scrollbar>
+
 
 </template>
 
@@ -126,41 +185,79 @@
 import {onBeforeMount, toRaw} from "vue";
 import axios from "axios";
 import {reactive} from "@vue/reactivity";
-import {ArrowDown, Message} from "@element-plus/icons-vue";
+import {ArrowDown, ArrowLeft, ArrowRight, Message, Setting} from "@element-plus/icons-vue";
 import {ref} from 'vue'
 import {DropdownInstance, ElMessage} from 'element-plus'
 import router from "@/router";
+import {shallowRef} from "vue";
+import {menusEvent} from 'vue3-menus';
 import route from "@/router";
 
 const dropdown1 = ref<DropdownInstance>()
 const dropdown2 = ref<DropdownInstance>()
+const dropdown3 = ref<DropdownInstance>()
 const table = ref()
 let reportVisible = ref()
 const reportList = ref(['', ''])
+const currentRightClick = ref()
+let group: any;
 
-let group;
+function refresh() {
+  getMessageList(true)
+}
 
+function pageChange(num: any) {
+  getMessageList(false, currentPage.value + num, size.value)
+}
 
 function showClick(e: any) {
   if (e == 1) {
     if (!dropdown1.value) return
     dropdown1.value.handleOpen()
-  } else {
+  } else if (e == 2) {
     if (!dropdown2.value) return
     dropdown2.value.handleOpen()
+  } else if (e == 3) {
+    if (!dropdown3.value) return
+    dropdown3.value.handleOpen()
   }
+
 
 }
 
 
 let selectList: any;
 const data = reactive({
-  tableData: []
+  tableData: [],
 })
-const getMessageList = () => {
-  axios.get("/api/email/getSendBox").then(e => {
-    if (e.data.flag === true) {
-      data.tableData = e.data.data
+let currentPage = ref()
+let totalPages = ref()
+let pages = ref()
+let size = ref(20)
+
+
+function getMessageList(flag = false, page = 1, size = 20) {
+  console.log(flag, page, size)
+  axios.get("/api/email/getEmailByGroup?group=" + group + "&page=" + page + "&size=" + size).then(res => {
+    if (res.data.flag === true) {
+      ({records: data.tableData} = res.data.data);
+      pages.value = res.data.data.pages == 0 ? 1 : res.data.data.pages
+      currentPage.value = res.data.data.current
+      if (flag) {
+        ElMessage.success("刷新成功")
+      }
+    }
+  })
+}
+
+const moveEmailGroup = (group: any) => {
+  if (ifNotSelect()) {
+    return
+  }
+  axios.post("/api/email/moveEmailGroup?group=" + group, selectList).then(res => {
+    if (res.data.flag == true) {
+      ElMessage.success("移动成功")
+      getMessageList();
     }
   })
 }
@@ -168,10 +265,9 @@ const getMessageList = () => {
 
 onBeforeMount(() => {
   group = route.currentRoute.value.query.group
-  axios.get("/api/email/getEmailByGroup?group=" + group).then(res => {
-    data.tableData = res.data.data
-  })
+  getMessageList()
 })
+
 const emailClick = (e: any) => {
   console.log()
   router.push({
@@ -212,7 +308,8 @@ function deleteEmail() {
 function select(e: any) {
   selectList = toRaw(e)
 }
-function ifNotSelect(){
+
+function ifNotSelect() {
   if (selectList == null || selectList.length == 0) {
     ElMessage.warning("您还没有选中")
     return true
@@ -220,13 +317,13 @@ function ifNotSelect(){
   return false
 }
 
-function markRead(){
-  if(ifNotSelect()){
+function markRead() {
+  if (ifNotSelect()) {
     return
   }
   for (let i = 0; i < selectList.length; i++) {
-    if(selectList[i].statusText!="已读"){
-      axios.post("/api/email/markRead",selectList).then(res=>{
+    if (selectList[i].statusText != "已读") {
+      axios.post("/api/email/markRead", selectList).then(res => {
         ElMessage.success("标记成功")
         getMessageList()
       })
@@ -236,20 +333,22 @@ function markRead(){
   ElMessage.warning("您选择的都是已读，请重新选择")
 
 }
-function markAllRead(){
-  axios.post("/api/email/markAllRead").then(res=>{
+
+function markAllRead() {
+  axios.post("/api/email/markAllRead").then(res => {
     ElMessage.success("标记成功")
     getMessageList()
   })
 
 }
-function markNotRead(){
-  if(ifNotSelect()){
+
+function markNotRead() {
+  if (ifNotSelect()) {
     return
   }
   for (let i = 0; i < selectList.length; i++) {
-    if(selectList[i].statusText!="未读"){
-      axios.post("/api/email/markNotRead",selectList).then(res=>{
+    if (selectList[i].statusText != "未读") {
+      axios.post("/api/email/markNotRead", selectList).then(res => {
         ElMessage.success("标记成功")
         getMessageList()
       })
@@ -259,6 +358,97 @@ function markNotRead(){
   ElMessage.warning("您选择的都是未读，请重新选择")
 
 }
+
+function row_rightClick(event: any) {
+  currentRightClick.value = toRaw(event)
+}
+
+
+function rightClick(event: any) {
+  const target = event.target;
+  const header = target.closest('.el-table__header');
+  if (header) {
+    //点击的表格头部
+    return;
+  }
+  event.preventDefault();
+  menusEvent(event, menus.value, 1);
+}
+
+const menus = shallowRef({
+  menus: [
+    {
+      label: "设置待办",
+      click: () => {
+        if (currentRightClick.value == null) {
+          ElMessage.warning("您还没有选择哦")
+          return
+        }
+        let dataList = []
+        dataList.push(toRaw(currentRightClick.value))
+        axios.post("/api/email/moveEmailGroup?group=" + "待办邮件", dataList).then(res => {
+          if (res.data.flag == true) {
+            ElMessage.success("移动成功")
+            getMessageList();
+          }
+        })
+      }
+    },
+    {
+      label: "设为未读",
+      click: () => {
+        if (currentRightClick.value == null) {
+          ElMessage.warning("您还没有选择哦")
+          return
+        }
+        let dataList = []
+        dataList.push(toRaw(currentRightClick.value))
+        axios.post("/api/email/markNotRead", dataList).then(res => {
+          ElMessage.success("标记成功")
+          getMessageList()
+        })
+      }
+    },
+    {
+      label: "置顶邮件",
+      disabled: true
+    },
+    {
+      label: "添加备注",
+      click: () => location.reload(),
+      divided: true
+    },
+    {
+      label: "删除邮件",
+      click: () => {
+        if (currentRightClick.value == null) {
+          ElMessage.warning("您还没有选择哦")
+          return
+        }
+        let dataList = []
+        dataList.push(toRaw(currentRightClick.value))
+        axios.post("/api/email/deleteEmail", dataList).then(e => {
+          if (e.data.flag == true) {
+            ElMessage.success("删除成功")
+            getMessageList();
+          } else {
+            ElMessage.error(e.data.message)
+          }
+        })
+      }
+    },
+    {
+      label: "举报垃圾邮件",
+      click: () => {
+        if (currentRightClick.value == null) {
+          ElMessage.warning("您还没有选择哦")
+          return
+        }
+        reportVisible.value = true
+      }
+    }
+  ]
+})
 
 
 </script>

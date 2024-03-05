@@ -3,9 +3,9 @@ package org.ymail.utils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.ymail.util.ThreadPool;
 
 import java.net.ServerSocket;
-import java.net.Socket;
 
 
 /**

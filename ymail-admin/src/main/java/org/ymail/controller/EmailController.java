@@ -29,8 +29,8 @@ public class EmailController {
         return emailService.getSendBox();
     }
     @GetMapping("/getEmailByGroup")
-    public Result<Object> getEmailByGroup(String group){
-        return emailService.getEmailByGroup(group);
+    public Result<Object> getEmailByGroup(String group,int page,int size){
+        return emailService.getEmailByGroup(group,page,size);
     }
 
     @GetMapping("/readEmail")

@@ -3,6 +3,8 @@ package org.ymail.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.ymail.entity.Attachment;
@@ -15,6 +17,7 @@ import org.ymail.mapper.EmailMapper;
 import org.ymail.resp.EmailResp;
 import org.ymail.service.EmailService;
 import org.ymail.util.Result;
+import org.ymail.util.ThreadPool;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,14 +51,22 @@ public class EmailServiceImpl implements EmailService {
                 .eq(Email::getGroup, EmailGroup.RECEIVE_BOX.getValue())
                 .orderByDesc(Email::getUpdateTime);
 
-        List<Email> emails = emailMapper.selectList(queryWrapper);
+        IPage<Email>page=new Page<>(1,10);
+
+        IPage<Email> emails = emailMapper.selectPage(page, queryWrapper);
+
         List<EmailResp>res=new ArrayList<>();
-        emails.forEach(u->{
+        emails.getRecords().forEach(u->{
             EmailResp emailResp= BeanUtil.copyProperties(u,EmailResp.class);
             emailResp.setStatusText(EmailStatus.getValueByKey(emailResp.getStatus()));
             res.add(emailResp);
         });
-        return Result.success(res);
+        IPage<EmailResp>respIPage=new Page<>();
+        respIPage.setRecords(res);
+        respIPage.setTotal(emails.getTotal());
+        respIPage.setCurrent(emails.getCurrent());
+        respIPage.setRecords(res);
+        return Result.success(respIPage);
     }
 
     @Override
@@ -74,6 +85,13 @@ public class EmailServiceImpl implements EmailService {
             List<Attachment> attachments = attachMapper.selectList(queryWrapper);
             emailResp.setAttachments(attachments);
         }
+        //标记为已读，异步
+        ThreadPool.getThread(()->{
+            List<Email>list=new ArrayList<>();
+            list.add(email);
+            markRead(list);
+        });
+
 
         return Result.success(emailResp);
     }
@@ -148,21 +166,32 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public Result<Object> getEmailByGroup(String group) {
+    public Result<Object> getEmailByGroup(String group,int page,int size) {
+        System.out.println(page+" "+size);
         LambdaQueryWrapper<Email>queryWrapper=new LambdaQueryWrapper<Email>()
                 .eq(Email::getMaster,UserContext.getUserMail())
                 .eq(Email::getDelFlag,0)
                 .eq(Email::getGroup, group)
                 .orderByDesc(Email::getUpdateTime);
 
-        List<Email> emails = emailMapper.selectList(queryWrapper);
+        IPage<Email>ipage=new Page<>(page,size);
+
+        IPage<Email> emails = emailMapper.selectPage(ipage, queryWrapper);
+
         List<EmailResp>res=new ArrayList<>();
-        emails.forEach(u->{
+        emails.getRecords().forEach(u->{
             EmailResp emailResp= BeanUtil.copyProperties(u,EmailResp.class);
             emailResp.setStatusText(EmailStatus.getValueByKey(emailResp.getStatus()));
             res.add(emailResp);
         });
-        return Result.success(res);
+        IPage<EmailResp>respIPage=new Page<>();
+        respIPage.setRecords(res);
+        respIPage.setTotal(emails.getTotal());
+        respIPage.setCurrent(emails.getCurrent());
+        respIPage.setRecords(res);
+        respIPage.setSize(emails.getSize());
+        respIPage.setPages(emails.getPages());
+        return Result.success(respIPage);
     }
 
     @Override

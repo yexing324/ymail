@@ -86,7 +86,9 @@
       </template>
     </el-dropdown>
 
-    <el-button text style=" border: 1px solid #b7bcc7; font-size: 13px;width: 60px;margin-left: 13px">刷新</el-button>
+    <el-button @click="refresh" text style=" border: 1px solid #b7bcc7; font-size: 13px;width: 60px;margin-left: 13px">
+      刷新
+    </el-button>
 
   </div>
 
@@ -101,7 +103,8 @@
         :data="data.tableData"
         @rowClick="emailClick"
         @selection-change="select"
-        @contextmenu="rightClick"
+        @row-contextmenu="row_rightClick($event)"
+        @contextmenu="rightClick($event)"
 
     >
       <el-table-column type="selection" width="30"/>
@@ -141,7 +144,12 @@ const dropdown2 = ref<DropdownInstance>()
 const table = ref()
 let reportVisible = ref()
 const reportList = ref(['', ''])
+const currentRightClick = ref()
 
+
+function refresh() {
+  getMessageList(true)
+}
 
 function showClick(e: any) {
   if (e == 1) {
@@ -159,13 +167,19 @@ let selectList: any;
 const data = reactive({
   tableData: []
 })
-const getMessageList = () => {
+
+
+function getMessageList(flag=false) {
   axios.get("/api/email/getMessage").then(e => {
     if (e.data.flag === true) {
       data.tableData = e.data.data
+      if(flag){
+        ElMessage.success("刷新成功")
+      }
     }
   })
 }
+
 const moveEmailGroup = (group: any) => {
   if (ifNotSelect()) {
     return
@@ -273,18 +287,14 @@ function markNotRead() {
 
 }
 
-
+function row_rightClick(event: any) {
+  currentRightClick.value = toRaw(event)
+}
 
 
 function rightClick(event: any) {
-  const target = event.target;
-  const header = target.closest('.el-table__header');
-  if (header) {
-    //不执行
-  } else {
-    menusEvent(event, menus.value, 1);
-    event.preventDefault();
-  }
+  event.preventDefault();
+  menusEvent(event, menus.value, 1);
 }
 
 const menus = shallowRef({
@@ -292,13 +302,25 @@ const menus = shallowRef({
     {
       label: "设置待办",
       click: () => {
-        window.history.back();
+        let dataList = []
+        dataList.push(toRaw(currentRightClick.value))
+        axios.post("/api/email/moveEmailGroup?group=" + "待办邮件", dataList).then(res => {
+          if (res.data.flag == true) {
+            ElMessage.success("移动成功")
+            getMessageList();
+          }
+        })
       }
     },
     {
       label: "设为未读",
       click: () => {
-        return false;
+        let dataList = []
+        dataList.push(toRaw(currentRightClick.value))
+        axios.post("/api/email/markNotRead", dataList).then(res => {
+          ElMessage.success("标记成功")
+          getMessageList()
+        })
       }
     },
     {
@@ -312,15 +334,28 @@ const menus = shallowRef({
     },
     {
       label: "删除邮件",
+      click: () => {
+        let dataList = []
+        dataList.push(toRaw(currentRightClick.value))
+        axios.post("/api/email/deleteEmail", dataList).then(e => {
+          if (e.data.flag == true) {
+            ElMessage.success("删除成功")
+            getMessageList();
+
+          } else {
+            ElMessage.error(e.data.message)
+          }
+        })
+      }
     },
     {
       label: "举报垃圾邮件",
-      click: () => window.print(),
+      click: () => {
+        reportVisible.value = true
+      }
     }
   ]
 })
-
-
 
 
 </script>
