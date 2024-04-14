@@ -17,6 +17,7 @@ import org.ymail.mapper.AttachMapper;
 import org.ymail.mapper.EmailMapper;
 import org.ymail.mapper.EmailReportMapper;
 import org.ymail.resp.EmailBo;
+import org.ymail.resp.EmailResp;
 import org.ymail.service.EmailService;
 import org.ymail.util.MPage;
 import org.ymail.util.Result;
@@ -189,21 +190,14 @@ public class EmailServiceImpl implements EmailService {
 
         IPage<Email> emails = emailMapper.selectPage(ipage, queryWrapper);
 
-         //置顶邮件
-        List<EmailBo>pinnedEmailList=new ArrayList<>();
-        //今日邮件
-        List<EmailBo>todayEmailList=new ArrayList<>();
-         //昨日邮件
-        List<EmailBo>yesterdayEmailLis=new ArrayList<>();
-        //更早的邮件
-        List<EmailBo>previousEmailList=new ArrayList<>();
+        EmailResp emailResp=new EmailResp();
 
         for (Email u : emails.getRecords()) {//处理返回的邮件列表
             EmailBo emailBo = BeanUtil.copyProperties(u, EmailBo.class);
             emailBo.setStatusText(EmailStatus.getValueByKey(emailBo.getStatus()));
             //判断逻辑
             if (u.isPinned()) {
-                pinnedEmailList.add(emailBo);
+                emailResp.getPinnedEmailList().add(emailBo);
                 continue;
             }
             //判断日期
@@ -214,40 +208,21 @@ public class EmailServiceImpl implements EmailService {
 
             if (createDate.isEqual(currentDate)) {
                 // 时间是今天
-                todayEmailList.add(emailBo);
+                emailResp.getTodayEmailList().add(emailBo);
                 continue;
             }
             if (createDate.isEqual(yesterday)) {
-                yesterdayEmailLis.add(emailBo);
+                emailResp.getYesterdayEmailLis().add(emailBo);
                 // 时间是昨天
                 continue;
             }
             //时间是更早之前
-            previousEmailList.add(emailBo);
-        }
-        //将所有消息添加到置顶消息里面
-        //这个写法并不规范，量比较少，暂时可以这样写
-        List<EmailBo>res=new ArrayList<>();
-        if(!pinnedEmailList.isEmpty()){
-            res.add(new EmailBo("置顶"+"("+pinnedEmailList.size()+")"));
-            res.addAll(pinnedEmailList);
-        }
-        if(!todayEmailList.isEmpty()){
-            res.add(new EmailBo("今日"+"("+todayEmailList.size()+")"));
-            res.addAll(todayEmailList);
-        }
-        if(!yesterdayEmailLis.isEmpty()){
-            res.add(new EmailBo("昨日"+"("+yesterdayEmailLis.size()+")"));
-            res.addAll(yesterdayEmailLis);
-        }
-        if(!previousEmailList.isEmpty()){
-            res.add(new EmailBo("更早"+"("+previousEmailList.size()+")"));
-            res.addAll(previousEmailList);
+            emailResp.getPreviousEmailList().add(emailBo);
         }
 
-        //这里自定义分页并不必要
-        MPage<List<EmailBo>> respIPage = new MPage<>();
-        respIPage.setData(res);
+        //因为是对象类型，所以需要自定义分页
+        MPage<EmailResp> respIPage = new MPage<>();
+        respIPage.setData(emailResp);
         respIPage.setTotal(emails.getTotal());
         respIPage.setCurrent(emails.getCurrent());
         respIPage.setSize(emails.getSize());
