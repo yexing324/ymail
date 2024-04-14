@@ -1,5 +1,6 @@
 <template>
   <button @click="show">点击</button>
+  <el-checkbox :indeterminate="isIndeterminate"  @change="btn1"   v-model="allCheck" size="large" />
 
     <el-checkbox-group v-model="checkList">
 
@@ -10,10 +11,12 @@
           style="width: 100%"
           @selection-change="handleSelectionChange"
       >
-        <template #default="{row}">
-          <el-table-column >
-            <span></span>
-            <el-checkbox   :label="row" :model-value="row" size="large" />
+
+          <el-table-column width="100" >
+            <template #default="{row}">
+              <el-checkbox @change="btn"  :value="row['date']" size="large" />
+            </template>
+
           </el-table-column>
 
 
@@ -23,7 +26,7 @@
           </el-table-column>
           <el-table-column property="name" label="Name" width="120" />
           <el-table-column property="address" label="Address" show-overflow-tooltip />
-        </template>
+
 
 
       </el-table>
@@ -40,14 +43,11 @@
 
 
 
-        <el-table-column>
-          <el-checkbox  label="Opti1" size="large" />
+        <el-table-column width="100">
+          <template #default="{row}">
+            <el-checkbox @change="btn"  :value="row['name']" size="large" />
+          </template>
         </el-table-column>
-
-
-
-
-
 
         <el-table-column label="Date" width="120">
           <template #default="scope">{{ scope.row.date }}</template>
@@ -55,6 +55,10 @@
         <el-table-column property="name" label="Name" width="120" />
         <el-table-column property="address" label="Address" show-overflow-tooltip />
       </el-table>
+
+
+
+
     </el-checkbox-group>
 
 
@@ -79,6 +83,7 @@ import { ref } from 'vue'
 import { ElTable } from 'element-plus'
 let checked1: any;
 function show(){
+  console.log(allCheck)
   console.log(checkList)
 }
 interface User {
@@ -106,32 +111,7 @@ const handleSelectionChange = (val: User[]) => {
 const tableData: User[] = [
   {
     date: '2016-05-03',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-02',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-04',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-01',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-08',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-06',
-    name: 'Tom',
+    name: 'Tom1',
     address: 'No. 189, Grove St, Los Angeles',
   },
   {
@@ -140,7 +120,35 @@ const tableData: User[] = [
     address: 'No. 189, Grove St, Los Angeles',
   },
 ]
+function btn(e:any){
+  if(checkList.value.length == 4){
+    isIndeterminate.value=false;
+    allCheck.value=true;
+    return;
+  }
+  if(checkList.value.length!=0){
+    allCheck.value=false;
+    isIndeterminate.value=true;
+    return;
+  }
+  if(checkList.value.length==0){
+    allCheck.value=false;
+    isIndeterminate.value=false;
+  }
+}
 
+function btn1(e:any){
+  if(checkList.value.length==0){
+    checkList.value=table
+  }else{
+    checkList.value=[]
+    allCheck.value=false;
+    isIndeterminate.value=false;
+  }
+}
 
-const checkList = ref([])
+const checkList = ref([] as any[])
+const allCheck = ref(false)
+const isIndeterminate=ref(false)
+const table=["2016-05-07","2016-05-03","Tom","Tom1"]
 </script>
