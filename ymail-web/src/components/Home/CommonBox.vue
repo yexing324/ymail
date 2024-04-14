@@ -145,9 +145,11 @@
         @row-contextmenu="row_rightClick($event)"
         @contextmenu="rightClick($event)"
         style="min-height: 500px;text-align: left"
+
     >
 
       <el-table-column type="selection" width="30"/>
+
       <el-table-column width="50">
         <template #default="{ row }">
           <span v-if="row.statusText == '未读'">
@@ -157,7 +159,8 @@
       </el-table-column>
 
       <el-table-column prop="nickname" label="发件人" width="150"/>
-      <el-table-column prop="subject" label="主题" width="720"/>
+      <el-table-column prop="subject" label="主题" width="150"/>
+      <el-table-column prop="plainText" label="内容" style="overflow: hidden;height: 200px" class="notEnter" />
       <el-table-column prop="updateTime" width="360"/>
 
     </el-table>
@@ -487,5 +490,11 @@ const menus = shallowRef({
 
 .report {
   text-align: left
+}
+.myCell .el-checkbox__input {
+  display: none !important;
+}
+.notEnter{
+  white-space: nowrap; display: inline-block
 }
 </style>

@@ -1,8 +1,7 @@
 package org.ymail.service;
 
 import org.ymail.entity.Email;
-import org.ymail.entity.EmailReport;
-import org.ymail.resp.EmailResp;
+import org.ymail.resp.EmailBo;
 import org.ymail.util.Result;
 
 import java.util.List;
@@ -16,7 +15,7 @@ public interface EmailService {
      */
     Result<Object> getMessage();
 
-    Result<EmailResp> readEmail(String emailId);
+    Result<EmailBo> readEmail(String emailId);
 
     Result<Void> deleteEmail(List<Email> deleteEmail);
 
@@ -28,9 +27,12 @@ public interface EmailService {
 
     Result<Object> getSendBox();
 
-    Result<Object> getEmailByGroup(String group,int page,int size);
+    Result<Object> getEmailByReceiveGroup(String group,int page,int size);
+    Result<Object> getEmailByGroup(String group, int page, int size);
 
     Result<Void> moveEmailGroup(List<Email>emails,String group);
 
     Result<Void> reportEmail(List<Email> email,String reason);
+
+
 }

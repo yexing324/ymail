@@ -16,12 +16,16 @@ import org.ymail.filter.UserContext;
 import org.ymail.mapper.AttachMapper;
 import org.ymail.mapper.EmailMapper;
 import org.ymail.mapper.EmailReportMapper;
-import org.ymail.resp.EmailResp;
+import org.ymail.resp.EmailBo;
 import org.ymail.service.EmailService;
+import org.ymail.util.MPage;
 import org.ymail.util.Result;
 import org.ymail.util.ThreadPool;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.ymail.enums.EmailStatus.READ_ALREADY;
@@ -33,8 +37,10 @@ public class EmailServiceImpl implements EmailService {
     private final EmailMapper emailMapper;
     private final AttachMapper attachMapper;
     private final EmailReportMapper emailReportMapper;
+
     /**
      * 获得用户登录时的具体信息
+     *
      * @return 信息
      */
     @Override
@@ -48,23 +54,23 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public Result<Object> getMessage() {
-        LambdaQueryWrapper<Email>queryWrapper=new LambdaQueryWrapper<Email>()
-                .eq(Email::getTo,UserContext.getUserMail())
-                .eq(Email::getDelFlag,0)
+        LambdaQueryWrapper<Email> queryWrapper = new LambdaQueryWrapper<Email>()
+                .eq(Email::getTo, UserContext.getUserMail())
+                .eq(Email::getDelFlag, 0)
                 .eq(Email::getGroup, EmailGroup.RECEIVE_BOX.getValue())
                 .orderByDesc(Email::getUpdateTime);
 
-        IPage<Email>page=new Page<>(1,10);
+        IPage<Email> page = new Page<>(1, 10);
 
         IPage<Email> emails = emailMapper.selectPage(page, queryWrapper);
 
-        List<EmailResp>res=new ArrayList<>();
-        emails.getRecords().forEach(u->{
-            EmailResp emailResp= BeanUtil.copyProperties(u,EmailResp.class);
-            emailResp.setStatusText(EmailStatus.getValueByKey(emailResp.getStatus()));
-            res.add(emailResp);
+        List<EmailBo> res = new ArrayList<>();
+        emails.getRecords().forEach(u -> {
+            EmailBo emailBo = BeanUtil.copyProperties(u, EmailBo.class);
+            emailBo.setStatusText(EmailStatus.getValueByKey(emailBo.getStatus()));
+            res.add(emailBo);
         });
-        IPage<EmailResp>respIPage=new Page<>();
+        IPage<EmailBo> respIPage = new Page<>();
         respIPage.setRecords(res);
         respIPage.setTotal(emails.getTotal());
         respIPage.setCurrent(emails.getCurrent());
@@ -73,43 +79,43 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public Result<EmailResp> readEmail(String emailId) {
-        Email email=emailMapper.selectOne(new LambdaQueryWrapper<Email>()
-                .eq(Email::getDelFlag,0)
-                .eq(Email::getId,emailId));
-        EmailResp emailResp= BeanUtil.copyProperties(email,EmailResp.class);
-        emailResp.setStatusText(EmailStatus.getValueByKey(emailResp.getStatus()));
+    public Result<EmailBo> readEmail(String emailId) {
+        Email email = emailMapper.selectOne(new LambdaQueryWrapper<Email>()
+                .eq(Email::getDelFlag, 0)
+                .eq(Email::getId, emailId));
+        EmailBo emailBo = BeanUtil.copyProperties(email, EmailBo.class);
+        emailBo.setStatusText(EmailStatus.getValueByKey(emailBo.getStatus()));
 
-        if(StrUtil.isNotBlank(emailResp.getAttachmentId())){
+        if (StrUtil.isNotBlank(emailBo.getAttachmentId())) {
             //初始化附件
             LambdaQueryWrapper<Attachment> queryWrapper = new LambdaQueryWrapper<Attachment>()
                     .eq(Attachment::getDelFlag, 0)
-                    .eq(Attachment::getId, emailResp.getAttachmentId());
+                    .eq(Attachment::getId, emailBo.getAttachmentId());
             List<Attachment> attachments = attachMapper.selectList(queryWrapper);
-            emailResp.setAttachments(attachments);
+            emailBo.setAttachments(attachments);
         }
         //标记为已读，异步
-        ThreadPool.getThread(()->{
-            List<Email>list=new ArrayList<>();
+        ThreadPool.getThread(() -> {
+            List<Email> list = new ArrayList<>();
             list.add(email);
             markRead(list);
         });
 
 
-        return Result.success(emailResp);
+        return Result.success(emailBo);
     }
 
     @Override
     public Result<Void> deleteEmail(List<Email> deleteEmail) {
-        if(deleteEmail.isEmpty()){
+        if (deleteEmail.isEmpty()) {
             throw new RuntimeException("您还没有选中邮件");
         }
-        try{
-            for (Email email:deleteEmail){
+        try {
+            for (Email email : deleteEmail) {
                 email.setDelFlag(1);
                 emailMapper.updateById(email);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             return Result.failure("删除出现错误");
         }
 
@@ -118,7 +124,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public Result<Void> markRead(List<Email> markReadEmail) {
-        markReadEmail.forEach(item->{
+        markReadEmail.forEach(item -> {
             item.setStatus(READ_ALREADY.getKey());
             emailMapper.updateById(item);
         });
@@ -127,7 +133,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public Result<Void> markNotRead(List<Email> markNotReadEmail) {
-        markNotReadEmail.forEach(item->{
+        markNotReadEmail.forEach(item -> {
             item.setStatus(READ_NOT.getKey());
             emailMapper.updateById(item);
         });
@@ -137,37 +143,121 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public Result<Void> markAllRead() {
         String userMail = UserContext.getUserMail();
-        LambdaQueryWrapper<Email>queryWrapper=new LambdaQueryWrapper<Email>()
-                .eq(Email::getDelFlag,0)
+        LambdaQueryWrapper<Email> queryWrapper = new LambdaQueryWrapper<Email>()
+                .eq(Email::getDelFlag, 0)
                 //TODO::判断当前登录者是否为邮件拥有者
 //                .eq(Email::getMaster,null)
-                .eq(Email::getTo,userMail);
-                //TODO::通过群组查询
+                .eq(Email::getTo, userMail);
+        //TODO::通过群组查询
 //                .eq(Email::getGroup,null);
-        Email email=new Email();
+        Email email = new Email();
         email.setStatus(READ_ALREADY.getKey());
-        emailMapper.update(email,queryWrapper);
+        emailMapper.update(email, queryWrapper);
         return Result.success();
     }
 
     @Override
     public Result<Object> getSendBox() {
-        LambdaQueryWrapper<Email>queryWrapper=new LambdaQueryWrapper<Email>()
-                .eq(Email::getMaster,UserContext.getUserMail())
-                .eq(Email::getDelFlag,0)
+        LambdaQueryWrapper<Email> queryWrapper = new LambdaQueryWrapper<Email>()
+                .eq(Email::getMaster, UserContext.getUserMail())
+                .eq(Email::getDelFlag, 0)
                 .eq(Email::getGroup, EmailGroup.SEND_BOX.getValue())
                 .orderByDesc(Email::getUpdateTime);
 
         List<Email> emails = emailMapper.selectList(queryWrapper);
-        List<EmailResp>res=new ArrayList<>();
-        emails.forEach(u->{
-            EmailResp emailResp= BeanUtil.copyProperties(u,EmailResp.class);
-            emailResp.setStatusText(EmailStatus.getValueByKey(emailResp.getStatus()));
-            res.add(emailResp);
+        List<EmailBo> res = new ArrayList<>();
+        emails.forEach(u -> {
+            EmailBo emailBo = BeanUtil.copyProperties(u, EmailBo.class);
+            emailBo.setStatusText(EmailStatus.getValueByKey(emailBo.getStatus()));
+            res.add(emailBo);
         });
         return Result.success(res);
     }
 
+    /**
+     * 收件箱和其他的确实不一样，所以需要分开写
+     */
+    @Override
+    public Result<Object> getEmailByReceiveGroup(String group, int page, int size) {
+            LambdaQueryWrapper<Email> queryWrapper = new LambdaQueryWrapper<Email>()
+                    .eq(Email::getMaster, UserContext.getUserMail())
+                    .eq(Email::getDelFlag, 0)
+                    .eq(Email::getGroup, group)
+                .orderByDesc(Email::getUpdateTime);
+
+        IPage<Email> ipage = new Page<>(page, size);
+
+        IPage<Email> emails = emailMapper.selectPage(ipage, queryWrapper);
+
+         //置顶邮件
+        List<EmailBo>pinnedEmailList=new ArrayList<>();
+        //今日邮件
+        List<EmailBo>todayEmailList=new ArrayList<>();
+         //昨日邮件
+        List<EmailBo>yesterdayEmailLis=new ArrayList<>();
+        //更早的邮件
+        List<EmailBo>previousEmailList=new ArrayList<>();
+
+        for (Email u : emails.getRecords()) {//处理返回的邮件列表
+            EmailBo emailBo = BeanUtil.copyProperties(u, EmailBo.class);
+            emailBo.setStatusText(EmailStatus.getValueByKey(emailBo.getStatus()));
+            //判断逻辑
+            if (u.isPinned()) {
+                pinnedEmailList.add(emailBo);
+                continue;
+            }
+            //判断日期
+            Date createTime = emailBo.getCreateTime();
+            LocalDate createDate = createTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate currentDate = LocalDate.now();
+            LocalDate yesterday = currentDate.minusDays(1);
+
+            if (createDate.isEqual(currentDate)) {
+                // 时间是今天
+                todayEmailList.add(emailBo);
+                continue;
+            }
+            if (createDate.isEqual(yesterday)) {
+                yesterdayEmailLis.add(emailBo);
+                // 时间是昨天
+                continue;
+            }
+            //时间是更早之前
+            previousEmailList.add(emailBo);
+        }
+        //将所有消息添加到置顶消息里面
+        //这个写法并不规范，量比较少，暂时可以这样写
+        List<EmailBo>res=new ArrayList<>();
+        if(!pinnedEmailList.isEmpty()){
+            res.add(new EmailBo("置顶"+"("+pinnedEmailList.size()+")"));
+            res.addAll(pinnedEmailList);
+        }
+        if(!todayEmailList.isEmpty()){
+            res.add(new EmailBo("今日"+"("+todayEmailList.size()+")"));
+            res.addAll(todayEmailList);
+        }
+        if(!yesterdayEmailLis.isEmpty()){
+            res.add(new EmailBo("昨日"+"("+yesterdayEmailLis.size()+")"));
+            res.addAll(yesterdayEmailLis);
+        }
+        if(!previousEmailList.isEmpty()){
+            res.add(new EmailBo("更早"+"("+previousEmailList.size()+")"));
+            res.addAll(previousEmailList);
+        }
+
+        //这里自定义分页并不必要
+        MPage<List<EmailBo>> respIPage = new MPage<>();
+        respIPage.setData(res);
+        respIPage.setTotal(emails.getTotal());
+        respIPage.setCurrent(emails.getCurrent());
+        respIPage.setSize(emails.getSize());
+        respIPage.setPages(emails.getPages());
+        return Result.success(respIPage);
+    }
+
+    /**
+     * 除了收件箱以外的邮件
+     */
     @Override
     public Result<Object> getEmailByGroup(String group,int page,int size) {
         System.out.println(page+" "+size);
@@ -181,13 +271,13 @@ public class EmailServiceImpl implements EmailService {
 
         IPage<Email> emails = emailMapper.selectPage(ipage, queryWrapper);
 
-        List<EmailResp>res=new ArrayList<>();
+        List<EmailBo>res=new ArrayList<>();
         emails.getRecords().forEach(u->{
-            EmailResp emailResp= BeanUtil.copyProperties(u,EmailResp.class);
-            emailResp.setStatusText(EmailStatus.getValueByKey(emailResp.getStatus()));
-            res.add(emailResp);
+            EmailBo emailBo= BeanUtil.copyProperties(u,EmailBo.class);
+            emailBo.setStatusText(EmailStatus.getValueByKey(emailBo.getStatus()));
+            res.add(emailBo);
         });
-        IPage<EmailResp>respIPage=new Page<>();
+        IPage<EmailBo>respIPage=new Page<>();
         respIPage.setRecords(res);
         respIPage.setTotal(emails.getTotal());
         respIPage.setCurrent(emails.getCurrent());
@@ -198,21 +288,21 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public Result<Void> moveEmailGroup(List<Email>emails,String group) {
-       if(emails==null||emails.isEmpty()){
-           throw new RuntimeException("未选择邮件");
-       }
-       for(Email email:emails){
-           email.setGroup(group);
-           emailMapper.updateById(email);
-       }
+    public Result<Void> moveEmailGroup(List<Email> emails, String group) {
+        if (emails == null || emails.isEmpty()) {
+            throw new RuntimeException("未选择邮件");
+        }
+        for (Email email : emails) {
+            email.setGroup(group);
+            emailMapper.updateById(email);
+        }
         return Result.success();
     }
 
     @Override
-    public Result<Void> reportEmail(List<Email> emails,String reason) {
-        for (Email email:emails){
-            EmailReport emailReport=new EmailReport();
+    public Result<Void> reportEmail(List<Email> emails, String reason) {
+        for (Email email : emails) {
+            EmailReport emailReport = new EmailReport();
             emailReport.setEmailId(email.getId());
             emailReport.setReason(reason);
             emailReportMapper.insert(emailReport);

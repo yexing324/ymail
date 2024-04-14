@@ -22,14 +22,19 @@ const handleNodeClick = (e: { label: any; }) => {
   switch (label) {
     case "收件箱":
       router.push({
-        path:'/commonBox',
+        path:'/receiveBox',
         query:{
           group:"收件箱"
         }
       })
       break;
     case "已发送":
-      router.push('/sendBox')
+      router.push({
+        path:'/commonBox',
+        query:{
+          group:"已发送"
+        }
+      })
       break;
     case "星标邮件":
       router.push({
@@ -67,7 +72,7 @@ const handleNodeClick = (e: { label: any; }) => {
       router.push({
         path:'/commonBox',
         query:{
-          group:"垃圾箱"
+          group:"垃圾邮件"
         }
       })
       break;

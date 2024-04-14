@@ -49,5 +49,15 @@ public class Email extends BaseDO {
      * 附件id
      */
     String attachmentId;
+    /**
+     * 是否置顶
+     */
+    boolean pinned;
+
+    /**
+     * 邮件颜色
+     */
+    String color;
+
 
 }

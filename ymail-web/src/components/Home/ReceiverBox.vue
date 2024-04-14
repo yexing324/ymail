@@ -1,376 +1,146 @@
 <template>
+  <button @click="show">点击</button>
 
-  <el-dialog
-      v-model="reportVisible"
-      title="举报邮件"
-      width="400"
-  >
+    <el-checkbox-group v-model="checkList">
 
 
-    <template #title>
-      <h3 class="report">您举报的邮件类型为:</h3>
-    </template>
-    <template #default>
-      <el-checkbox-group v-model="reportList">
-        <div class="report">
-          <el-checkbox label="仿冒邮件（仿冒各类通知）"/>
-          <el-checkbox label="色情邮件"/>
-        </div>
-        <div class="report">
-          <el-checkbox label="钓鱼邮件（诱导骗取信息）"/>
-          <el-checkbox label="违法邮件"/>
-        </div>
-        <div class="report">
-          <el-checkbox label="代开发票"/>
-          <el-checkbox label="广告推广"/>
-          <el-checkbox label="其他邮件"/>
-        </div>
-      </el-checkbox-group>
-    </template>
+      <el-table
+          ref="multipleTableRef"
+          :data="tableData"
+          style="width: 100%"
+          @selection-change="handleSelectionChange"
+      >
+        <template #default="{row}">
+          <el-table-column >
+            <span></span>
+            <el-checkbox   :label="row" :model-value="row" size="large" />
+          </el-table-column>
 
 
-    <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="reportVisible = false">取消</el-button>
-        <el-button type="primary" @click="reportVisible = false">
-          提交
-        </el-button>
-      </div>
-    </template>
-  </el-dialog>
 
-
-  <div style="display: flex">
-    <el-button @click="deleteEmail" text class="btn"
-               style="  border: 1px solid #b7bcc7; font-size: 13px;width: 60px">删 除
-    </el-button>
-    <el-button @click="reportEmail" text class="btn"
-               style="  border: 1px solid #b7bcc7; font-size: 13px;width: 60px">举 报
-    </el-button>
-
-    <el-dropdown ref="dropdown1" trigger="contextmenu" style="margin-left: 12px">
-      <el-button @click="showClick(1)" text class="btn"
-                 style="  border: 1px solid #b7bcc7; font-size: 13px;width: 80px">
-        标记为
-        <el-icon>
-          <arrow-down/>
-        </el-icon>
-      </el-button>
-      <template #dropdown>
-        <el-dropdown-menu>
-          <el-dropdown-item @click="markRead">已读</el-dropdown-item>
-          <el-dropdown-item @click="markNotRead">未读</el-dropdown-item>
-          <el-dropdown-item @click="markAllRead">全部设置为已读</el-dropdown-item>
-          <el-dropdown-item disabled>待办邮件</el-dropdown-item>
-          <el-dropdown-item disabled>标记邮件</el-dropdown-item>
-        </el-dropdown-menu>
-      </template>
-    </el-dropdown>
-
-    <el-dropdown ref="dropdown2" trigger="contextmenu" style="margin-left: 12px">
-      <el-button @click="showClick(2)" text class="btn"
-                 style="  border: 1px solid #b7bcc7; font-size: 13px;width: 80px">
-        移动到
-        <el-icon>
-          <arrow-down/>
-        </el-icon>
-      </el-button>
-      <template #dropdown>
-        <el-dropdown-menu>
-          <el-dropdown-item @click="moveEmailGroup('草稿箱')">草稿箱</el-dropdown-item>
-          <el-dropdown-item @click="moveEmailGroup('已发送')">已发送</el-dropdown-item>
-          <el-dropdown-item @click="moveEmailGroup('已删除')">已删除</el-dropdown-item>
-          <el-dropdown-item @click="moveEmailGroup('垃圾邮件')">垃圾邮件</el-dropdown-item>
-          <el-dropdown-item @click="moveEmailGroup('')" divided>新建文件夹并移动</el-dropdown-item>
-        </el-dropdown-menu>
-      </template>
-    </el-dropdown>
-
-    <el-button @click="refresh" text style=" border: 1px solid #b7bcc7; font-size: 13px;width: 60px;margin-left: 13px">
-      刷新
-    </el-button>
-
-  </div>
-
-
-  <el-scrollbar
-      style="height: 100%;text-align: left"
-      class="scrollbar-for"
-  >
-    <!-- 内容部分 -->
-    <el-table
-        ref="table"
-        :data="data.tableData"
-        @rowClick="emailClick"
-        @selection-change="select"
-        @row-contextmenu="row_rightClick($event)"
-        @contextmenu="rightClick($event)"
-
-    >
-      <el-table-column type="selection" width="30"/>
-      <el-table-column width="50">
-        <template #default="{ row }">
-          <span v-if="row.statusText == '未读'">
-            <el-icon style="margin-top: 6px;"><Message/></el-icon>
-          </span>
+          <el-table-column label="Date" width="120">
+            <template #default="scope">{{ scope.row.date }}</template>
+          </el-table-column>
+          <el-table-column property="name" label="Name" width="120" />
+          <el-table-column property="address" label="Address" show-overflow-tooltip />
         </template>
-      </el-table-column>
-
-      <el-table-column prop="nickname" label="发件人" width="150"/>
-      <el-table-column prop="subject" label="主题" width="720"/>
-      <el-table-column prop="updateTime" width="360"/>
 
 
-    </el-table>
-    <div style="height: 100px;margin-top: 50px">你好</div>
-  </el-scrollbar>
+      </el-table>
+
+
+      <el-table
+          ref="multipleTableRef"
+          :data="tableData"
+          style="width: 100%"
+          @selection-change="handleSelectionChange"
+          :show-header="false"
+      >
+
+
+
+
+        <el-table-column>
+          <el-checkbox  label="Opti1" size="large" />
+        </el-table-column>
+
+
+
+
+
+
+        <el-table-column label="Date" width="120">
+          <template #default="scope">{{ scope.row.date }}</template>
+        </el-table-column>
+        <el-table-column property="name" label="Name" width="120" />
+        <el-table-column property="address" label="Address" show-overflow-tooltip />
+      </el-table>
+    </el-checkbox-group>
+
+
+
+
+
+
+
+
+
+
+  <div style="margin-top: 20px">
+    <el-button @click="toggleSelection([tableData[1], tableData[2]])"
+    >Toggle selection status of second and third rows</el-button
+    >
+    <el-button @click="toggleSelection()">Clear selection</el-button>
+  </div>
 </template>
 
-
 <script lang="ts" setup>
-
-import {onBeforeMount, toRaw} from "vue";
-import axios from "axios";
-import {reactive} from "@vue/reactivity";
-import {ArrowDown, Message} from "@element-plus/icons-vue";
-import {ref} from 'vue'
-import {DropdownInstance, ElMessage} from 'element-plus'
-import router from "@/router";
-import {shallowRef} from "vue";
-import {menusEvent} from 'vue3-menus';
-
-const dropdown1 = ref<DropdownInstance>()
-const dropdown2 = ref<DropdownInstance>()
-const table = ref()
-let reportVisible = ref()
-const reportList = ref(['', ''])
-const currentRightClick = ref()
-
-
-function refresh() {
-  getMessageList(true)
+import { ref } from 'vue'
+import { ElTable } from 'element-plus'
+let checked1: any;
+function show(){
+  console.log(checkList)
+}
+interface User {
+  date: string
+  name: string
+  address: string
 }
 
-function showClick(e: any) {
-  if (e == 1) {
-    if (!dropdown1.value) return
-    dropdown1.value.handleOpen()
+const multipleTableRef = ref<InstanceType<typeof ElTable>>()
+const multipleSelection = ref<User[]>([])
+const toggleSelection = (rows?: User[]) => {
+  if (rows) {
+    rows.forEach((row) => {
+      // @ts-expect-error
+      multipleTableRef.value!.toggleRowSelection(row, undefined)
+    })
   } else {
-    if (!dropdown2.value) return
-    dropdown2.value.handleOpen()
+    multipleTableRef.value!.clearSelection()
   }
-
+}
+const handleSelectionChange = (val: User[]) => {
+  multipleSelection.value = val
 }
 
-
-let selectList: any;
-const data = reactive({
-  tableData: []
-})
-
-
-function getMessageList(flag=false) {
-  axios.get("/api/email/getMessage").then(e => {
-    if (e.data.flag === true) {
-      data.tableData = e.data.data
-      if(flag){
-        ElMessage.success("刷新成功")
-      }
-    }
-  })
-}
-
-const moveEmailGroup = (group: any) => {
-  if (ifNotSelect()) {
-    return
-  }
-  axios.post("/api/email/moveEmailGroup?group=" + group, selectList).then(res => {
-    if (res.data.flag == true) {
-      ElMessage.success("移动成功")
-      getMessageList();
-    }
-  })
-}
-
-
-onBeforeMount(() => {
-  getMessageList();
-})
-const emailClick = (e: any) => {
-  console.log()
-  router.push({
-    path: '/emailDetail',
-    query: {
-      id: toRaw(e).id
-    }
-  })
-}
-
-function reportEmail() {
-  if (selectList == null || selectList.length == 0) {
-    ElMessage.warning("您还没有选中")
-    return
-  }
-  reportVisible.value = true;
+const tableData: User[] = [
+  {
+    date: '2016-05-03',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles',
+  },
+  {
+    date: '2016-05-02',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles',
+  },
+  {
+    date: '2016-05-04',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles',
+  },
+  {
+    date: '2016-05-01',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles',
+  },
+  {
+    date: '2016-05-08',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles',
+  },
+  {
+    date: '2016-05-06',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles',
+  },
+  {
+    date: '2016-05-07',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles',
+  },
+]
 
 
-}
-
-function deleteEmail() {
-  if (selectList == null || selectList.length == 0) {
-    ElMessage.warning("您还没有选中")
-    return
-  }
-  axios.post("/api/email/deleteEmail", selectList).then(e => {
-    if (e.data.flag == true) {
-      ElMessage.success("删除成功")
-      //更新事件
-      getMessageList();
-
-    } else {
-      ElMessage.error(e.data.message)
-    }
-  });
-}
-
-function select(e: any) {
-  selectList = toRaw(e)
-}
-
-function ifNotSelect() {
-  if (selectList == null || selectList.length == 0) {
-    ElMessage.warning("您还没有选中")
-    return true
-  }
-  return false
-}
-
-function markRead() {
-  if (ifNotSelect()) {
-    return
-  }
-  for (let i = 0; i < selectList.length; i++) {
-    if (selectList[i].statusText != "已读") {
-      axios.post("/api/email/markRead", selectList).then(res => {
-        ElMessage.success("标记成功")
-        getMessageList()
-      })
-      return
-    }
-  }
-  ElMessage.warning("您选择的都是已读，请重新选择")
-
-}
-
-function markAllRead() {
-  axios.post("/api/email/markAllRead").then(res => {
-    ElMessage.success("标记成功")
-    getMessageList()
-  })
-
-}
-
-function markNotRead() {
-  if (ifNotSelect()) {
-    return
-  }
-  for (let i = 0; i < selectList.length; i++) {
-    if (selectList[i].statusText != "未读") {
-      axios.post("/api/email/markNotRead", selectList).then(res => {
-        ElMessage.success("标记成功")
-        getMessageList()
-      })
-      return
-    }
-  }
-  ElMessage.warning("您选择的都是未读，请重新选择")
-
-}
-
-function row_rightClick(event: any) {
-  currentRightClick.value = toRaw(event)
-}
-
-
-function rightClick(event: any) {
-  event.preventDefault();
-  menusEvent(event, menus.value, 1);
-}
-
-const menus = shallowRef({
-  menus: [
-    {
-      label: "设置待办",
-      click: () => {
-        let dataList = []
-        dataList.push(toRaw(currentRightClick.value))
-        axios.post("/api/email/moveEmailGroup?group=" + "待办邮件", dataList).then(res => {
-          if (res.data.flag == true) {
-            ElMessage.success("移动成功")
-            getMessageList();
-          }
-        })
-      }
-    },
-    {
-      label: "设为未读",
-      click: () => {
-        let dataList = []
-        dataList.push(toRaw(currentRightClick.value))
-        axios.post("/api/email/markNotRead", dataList).then(res => {
-          ElMessage.success("标记成功")
-          getMessageList()
-        })
-      }
-    },
-    {
-      label: "置顶邮件",
-      disabled: true
-    },
-    {
-      label: "添加备注",
-      click: () => location.reload(),
-      divided: true
-    },
-    {
-      label: "删除邮件",
-      click: () => {
-        let dataList = []
-        dataList.push(toRaw(currentRightClick.value))
-        axios.post("/api/email/deleteEmail", dataList).then(e => {
-          if (e.data.flag == true) {
-            ElMessage.success("删除成功")
-            getMessageList();
-
-          } else {
-            ElMessage.error(e.data.message)
-          }
-        })
-      }
-    },
-    {
-      label: "举报垃圾邮件",
-      click: () => {
-        reportVisible.value = true
-      }
-    }
-  ]
-})
-
-
+const checkList = ref([])
 </script>
-<style>
-
-
-.el-popper {
-  overflow: auto;
-}
-
-.el-popper.dropdownMenu {
-  background-color: red;
-}
-
-.report {
-  text-align: left
-}
-</style>

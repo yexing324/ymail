@@ -2,6 +2,8 @@ package org.ymail.resp;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.ymail.entity.Attachment;
 import org.ymail.entity.Email;
 
@@ -12,7 +14,8 @@ import java.util.List;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class EmailResp extends Email {
+@RequiredArgsConstructor
+public class EmailBo extends Email  {
     /**
      * 邮件状态文字
      */
@@ -21,5 +24,14 @@ public class EmailResp extends Email {
      * 邮件附件信息
      */
     List<Attachment>attachments;
+    /**
+     * 是否为普通消息
+     */
+    boolean isMessage=true;
+    String titleName;
+    public EmailBo(String name){
+        this.titleName=name;
+        isMessage=false;
+    }
 
 }

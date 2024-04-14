@@ -1,15 +1,13 @@
 package org.ymail.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.springframework.web.bind.annotation.*;
 import org.ymail.entity.Email;
-import org.ymail.entity.EmailReport;
-import org.ymail.resp.EmailResp;
+import org.ymail.enums.EmailGroup;
+import org.ymail.resp.EmailBo;
 import org.ymail.service.EmailService;
 import org.ymail.util.Result;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -33,11 +31,15 @@ public class EmailController {
     }
     @GetMapping("/getEmailByGroup")
     public Result<Object> getEmailByGroup(String group,int page,int size){
-        return emailService.getEmailByGroup(group,page,size);
+        if(EmailGroup.RECEIVE_BOX.getValue().equals(group))
+            return emailService.getEmailByReceiveGroup(group,page,size);
+        else{
+            return emailService.getEmailByGroup(group,page,size);
+        }
     }
 
     @GetMapping("/readEmail")
-    public Result<EmailResp> readEmail(String emailId){
+    public Result<EmailBo> readEmail(String emailId){
         return emailService.readEmail(emailId);
     }
     @PostMapping("/deleteEmail")
