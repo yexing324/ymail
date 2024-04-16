@@ -8,6 +8,7 @@ import WriteMessage from "@/views/WriteMessage.vue";
 import ReadEmail from "@/components/Home/readEmail.vue";
 import SendBox from "@/components/Home/SendBox.vue";
 import CommonBox from "@/components/Home/CommonBox.vue";
+import Temp from "@/components/Home/temp.vue";
 
 const routes: Array<RouteRecordRaw> = [
     {

@@ -1,4 +1,5 @@
 <template>
+  <button @click="btn">你好</button>
 
   <el-dialog
       v-model="reportVisible"
@@ -43,6 +44,8 @@
   <div style="overflow:hidden;">
     <!--    左边的按钮簇-->
     <div style="float: left">
+      <el-checkbox :indeterminate="isIndeterminate"  @click="allCheckChange"   :v-model="allCheck" size="large" />
+
       <el-button @click="deleteEmail" text class="btn"
                  style="  border: 1px solid #b7bcc7; font-size: 13px;width: 60px">删 除
       </el-button>
@@ -110,7 +113,7 @@
         </template>
       </el-dropdown>
 
-      <el-button-group style="margin-top: 0px;">
+      <el-button-group style="margin-top: 0;">
         <el-button style="border-radius:20px 0 0 20px" @click="pageChange(-1)" :disabled="currentPage==1"
                    :icon="ArrowLeft"></el-button>
         <el-button style="border-radius:0 20px 20px 0" @click="pageChange(+1)" :disabled="currentPage==pages">
@@ -136,9 +139,10 @@
   <el-scrollbar
       style="height: 100%;text-align: center"
   >
+
     <template v-for="(item ,index) in data">
       <div v-if="item.length!=0">
-        <div class="title" style="text-align: left" >
+        <div class="title" style="text-align: left">
           <span v-if="index==0">置顶</span>
           <span v-if="index==1">今天</span>
           <span v-if="index==2">昨天</span>
@@ -146,23 +150,23 @@
         </div>
 
         <el-table
-            ref="table"
+            :ref="setRef(index)"
             :data="item"
             @rowClick="emailClick"
-            @selection-change="select"
             @row-contextmenu="row_rightClick($event)"
             @contextmenu="rightClick($event)"
             style="text-align: left"
             :show-header="false"
+            @selectionChange="selectionChange(index,$event)"
 
         >
-          <el-table-column type="selection" width="30"/>
+          <el-table-column  type="selection"  width="30"/>
 
           <el-table-column width="50">
             <template #default="{ row }">
-              <!--          <span v-if="row.statusText == '未读'">-->
-              <!--            <el-icon style="margin-top: 6px;"><Message/></el-icon>-->
-              <!--          </span>-->
+              <!--                          <span v-if="row.statusText == '未读'">-->
+              <!--                            <el-icon style="margin-top: 6px;"><Message/></el-icon>-->
+              <!--                          </span>-->
             </template>
           </el-table-column>
 
@@ -176,24 +180,17 @@
     </template>
 
 
-    <el-checkbox-group v-model="checkList">
-
-
-
-      <div style="height: 100px;margin-top: 20px">
-        <el-button-group>
-          <el-button @click="pageChange(-1)" :disabled="currentPage==1" :icon="ArrowLeft">上一页</el-button>
-          <el-button @click="pageChange(+1)" :disabled="currentPage==pages">
-            下一页
-            <el-icon class="el-icon--right">
-              <ArrowRight/>
-            </el-icon>
-          </el-button>
-        </el-button-group>
-      </div>
-
-
-    </el-checkbox-group>
+    <div style="height: 100px;margin-top: 20px">
+      <el-button-group>
+        <el-button @click="pageChange(-1)" :disabled="currentPage==1" :icon="ArrowLeft">上一页</el-button>
+        <el-button @click="pageChange(+1)" :disabled="currentPage==pages">
+          下一页
+          <el-icon class="el-icon--right">
+            <ArrowRight/>
+          </el-icon>
+        </el-button>
+      </el-button-group>
+    </div>
 
 
     <!-- 内容部分 -->
@@ -208,27 +205,79 @@
 <script lang="ts" setup>
 
 import {onBeforeMount, toRaw} from "vue";
-import axios from "axios";
+import axios, {all} from "axios";
 import {reactive} from "@vue/reactivity";
-import {ArrowDown, ArrowLeft, ArrowRight, Message, Setting} from "@element-plus/icons-vue";
+import {ArrowDown, ArrowLeft, ArrowRight, Setting} from "@element-plus/icons-vue";
 import {ref} from 'vue'
-import {DropdownInstance, ElMessage, ElTable} from 'element-plus'
+import {DropdownInstance, ElMessage, ElTable, Table} from 'element-plus'
 import router from "@/router";
 import {shallowRef} from "vue";
 import {menusEvent} from 'vue3-menus';
 import route from "@/router";
 
+const items = ref([{ id: 1 }, { id: 2 }]);
+const refsMap = ref({} as any);
+const name1=ref()
+const name2=ref()
+const name3=ref()
+const name4=ref()
+function setRef( index:any) {
+  return (el:any) => {
+    if (el) {
+      refsMap.value[`name${index}`] = el;
+    }
+  };
+}
+
+function btn(){
+  Object.values(refsMap.value).forEach(inputEl => {
+    if (inputEl) {
+      console.log(inputEl)
+      inputEl.clearSelection(); // 清空输入框
+    }
+  });
+  // console.log(refsMap.value[0].value)
+  // refsMap.value[0].value.clearSelection();
+  // table_0value!.clearSelection().
+  // console.log(checkList)
+}
+/**
+ * 未知的变量
+ */
 const dropdown1 = ref<DropdownInstance>()
 const dropdown2 = ref<DropdownInstance>()
 const dropdown3 = ref<DropdownInstance>()
+/**
+ * 下面三个是选择框相关的
+ */
+const allCheck = ref(false)
+const isIndeterminate=ref(false)
+let selectList1=[[],[],[],[]];
+
+function selectionChange(index:Number|any ,e: any){
+  selectList1[index]=toRaw(e)
+
+}
+function allCheckChange(){
+  if(allCheck.value==false){
+    //非全选变全选
+    isIndeterminate.value=false;
+    allCheck.value=true
+
+  }else if(allCheck.value==true){
+    //全选变不选
+    allCheck.value=false;
+    isIndeterminate.value=false;
+    table_0.value!.clearSelection()
+  }
+}
+
 
 //表格数据
-const data = reactive([
+const data = reactive([] as any)
+const checkList = ref([] as any[])
 
-] as any)
-let checkList = []
-
-const table = ref()
+const table_0 = ref<InstanceType<typeof ElTable>>()
 let reportVisible = ref()
 const report = ref()
 const currentRightClick = ref()
@@ -298,7 +347,7 @@ function getMessageList(flag = false, page = 1, size = 20) {
       data.push(res.data.data.data.todayEmailList)
       data.push(res.data.data.data.yesterdayEmailLis)
       data.push(res.data.data.data.previousEmailList)
-      console.log(data.previousEmailList)
+      // console.log(data.previousEmailList)
       pages.value = res.data.data.pages == 0 ? 1 : res.data.data.pages
       currentPage.value = res.data.data.current
       if (flag) {
@@ -326,7 +375,7 @@ onBeforeMount(() => {
   getMessageList()
 })
 
-const emailClick = (e: any) => {
+const emailClick = (e:any) => {
   router.push({
     path: '/emailDetail',
     query: {
@@ -380,7 +429,7 @@ function markRead() {
   }
   for (let i = 0; i < selectList.length; i++) {
     if (selectList[i].statusText != "已读") {
-      axios.post("/api/email/markRead", selectList).then(res => {
+      axios.post("/api/email/markRead", selectList).then(() => {
         ElMessage.success("标记成功")
         getMessageList()
       })
@@ -405,7 +454,7 @@ function markNotRead() {
   }
   for (let i = 0; i < selectList.length; i++) {
     if (selectList[i].statusText != "未读") {
-      axios.post("/api/email/markNotRead", selectList).then(res => {
+      axios.post("/api/email/markNotRead", selectList).then(() => {
         ElMessage.success("标记成功")
         getMessageList()
       })
@@ -460,7 +509,7 @@ const menus = shallowRef({
         }
         let dataList = []
         dataList.push(toRaw(currentRightClick.value))
-        axios.post("/api/email/markNotRead", dataList).then(res => {
+        axios.post("/api/email/markNotRead", dataList).then(() => {
           ElMessage.success("标记成功")
           getMessageList()
         })
@@ -537,7 +586,7 @@ const menus = shallowRef({
 .title {
   margin: 20px 0 20px 0;
   text-align: left;
-  display:inline-block;
+  display: inline-block;
   font-size: 20px;
   width: 100%;
 }

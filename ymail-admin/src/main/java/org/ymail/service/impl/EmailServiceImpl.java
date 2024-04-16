@@ -177,41 +177,67 @@ public class EmailServiceImpl implements EmailService {
 
     /**
      * 收件箱和其他的确实不一样，所以需要分开写
+     * TODO:一个文件夹置顶邮件只允许出现10封
+     * page最小值为1，size最小值为10
      */
+
     @Override
     public Result<Object> getEmailByReceiveGroup(String group, int page, int size) {
-            LambdaQueryWrapper<Email> queryWrapper = new LambdaQueryWrapper<Email>()
+        LambdaQueryWrapper<Email>queryWrapper=new LambdaQueryWrapper<>();
+        //防止NPE
+        List<Email>pinnedEmails=new ArrayList<>();
+        List<Email>otherEmails=new ArrayList<>();
+        IPage<Email> emails=new Page<>(1,10);
+        if(page==1){
+            //需要置顶
+            queryWrapper.eq(Email::getMaster, UserContext.getUserMail())
+                    .eq(Email::getDelFlag, 0)
+                    .eq(Email::isPinned,1)
+                    .eq(Email::getGroup, group)
+                    .orderByDesc(Email::getUpdateTime);
+            pinnedEmails=emailMapper.selectList(queryWrapper);
+            int pinnedSize=pinnedEmails.size();
+            if(pinnedSize<size) {
+                otherEmails=emailMapper.selectOtherEmail(UserContext.getUserMail(), group,pinnedSize,size-pinnedSize);
+            }
+        }else{
+            //不可能查出来置顶邮件
+            queryWrapper = new LambdaQueryWrapper<Email>()
                     .eq(Email::getMaster, UserContext.getUserMail())
                     .eq(Email::getDelFlag, 0)
                     .eq(Email::getGroup, group)
-                .orderByDesc(Email::getUpdateTime);
+                    .orderByAsc(Email::getUpdateTime);
 
-        IPage<Email> ipage = new Page<>(page, size);
+            IPage<Email> ipage = new Page<>(page, size);
+            emails = emailMapper.selectPage(ipage, queryWrapper);
+            otherEmails=emails.getRecords();
+        }
 
-        IPage<Email> emails = emailMapper.selectPage(ipage, queryWrapper);
 
         EmailResp emailResp=new EmailResp();
+        pinnedEmails.forEach(
+                u-> {
+                    EmailBo emailBo = BeanUtil.copyProperties(u, EmailBo.class);
+                    emailBo.setStatusText(EmailStatus.getValueByKey(emailBo.getStatus()));
+                    emailResp.getPinnedEmailList().add(emailBo);
+                }
+        );
 
-        for (Email u : emails.getRecords()) {//处理返回的邮件列表
+        for (Email u :otherEmails) {//处理返回的邮件列表
             EmailBo emailBo = BeanUtil.copyProperties(u, EmailBo.class);
             emailBo.setStatusText(EmailStatus.getValueByKey(emailBo.getStatus()));
-            //判断逻辑
-            if (u.isPinned()) {
-                emailResp.getPinnedEmailList().add(emailBo);
-                continue;
-            }
             //判断日期
-            Date createTime = emailBo.getCreateTime();
-            LocalDate createDate = createTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            Date updateTime = emailBo.getUpdateTime();
+            LocalDate updateDate = updateTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             LocalDate currentDate = LocalDate.now();
             LocalDate yesterday = currentDate.minusDays(1);
 
-            if (createDate.isEqual(currentDate)) {
+            if (updateDate.isEqual(currentDate)) {
                 // 时间是今天
                 emailResp.getTodayEmailList().add(emailBo);
                 continue;
             }
-            if (createDate.isEqual(yesterday)) {
+            if (updateDate.isEqual(yesterday)) {
                 emailResp.getYesterdayEmailLis().add(emailBo);
                 // 时间是昨天
                 continue;
