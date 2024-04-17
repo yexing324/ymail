@@ -1,6 +1,4 @@
 <template>
-  <button @click="btn">你好</button>
-
   <el-dialog
       v-model="reportVisible"
       title="举报邮件"
@@ -44,7 +42,14 @@
   <div style="overflow:hidden;">
     <!--    左边的按钮簇-->
     <div style="float: left">
-      <el-checkbox :indeterminate="isIndeterminate"  @click="allCheckChange"   :v-model="allCheck" size="large" />
+      <div style="float: left;margin: 0 10px 0 10px">
+        <el-checkbox
+            :indeterminate="isIndeterminate"
+            @click="allCheckChange"
+            v-model="allCheck"
+            size="large"/>
+      </div>
+
 
       <el-button @click="deleteEmail" text class="btn"
                  style="  border: 1px solid #b7bcc7; font-size: 13px;width: 60px">删 除
@@ -124,7 +129,7 @@
       </el-button-group>
       &nbsp;
 
-      <el-button style="border-radius: 60px;border: 1px solid grey;width: 20px;margin-right: 5px;">
+      <el-button @click="btn" style="border-radius: 60px;border: 1px solid grey;width: 20px;margin-right: 5px;">
         <el-icon size="20px">
           <Setting/>
         </el-icon>
@@ -142,12 +147,14 @@
 
     <template v-for="(item ,index) in data">
       <div v-if="item.length!=0">
-        <div class="title" style="text-align: left">
+        <div  style="text-align: left;margin: 9px 0 3px 9px;font-size: 13px;">
           <span v-if="index==0">置顶</span>
           <span v-if="index==1">今天</span>
           <span v-if="index==2">昨天</span>
           <span v-if="index==3">更早</span>
+          <el-divider class="line" style="margin-top: 3px;"></el-divider>
         </div>
+
 
         <el-table
             :ref="setRef(index)"
@@ -160,7 +167,7 @@
             @selectionChange="selectionChange(index,$event)"
 
         >
-          <el-table-column  type="selection"  width="30"/>
+          <el-table-column type="selection" width="30"/>
 
           <el-table-column width="50">
             <template #default="{ row }">
@@ -205,8 +212,7 @@
 <script lang="ts" setup>
 
 import {onBeforeMount, toRaw} from "vue";
-import axios, {all} from "axios";
-import {reactive} from "@vue/reactivity";
+import axios from "axios";
 import {ArrowDown, ArrowLeft, ArrowRight, Setting} from "@element-plus/icons-vue";
 import {ref} from 'vue'
 import {DropdownInstance, ElMessage, ElTable, Table} from 'element-plus'
@@ -214,33 +220,25 @@ import router from "@/router";
 import {shallowRef} from "vue";
 import {menusEvent} from 'vue3-menus';
 import route from "@/router";
-
-const items = ref([{ id: 1 }, { id: 2 }]);
+//存放几个table的实例
 const refsMap = ref({} as any);
-const name1=ref()
-const name2=ref()
-const name3=ref()
-const name4=ref()
-function setRef( index:any) {
-  return (el:any) => {
+
+/**
+ * 设置table的实例
+ * @param index 索引
+ */
+function setRef(index: any) {
+  return (el: any) => {
     if (el) {
       refsMap.value[`name${index}`] = el;
     }
   };
 }
 
-function btn(){
-  Object.values(refsMap.value).forEach(inputEl => {
-    if (inputEl) {
-      console.log(inputEl)
-      inputEl.clearSelection(); // 清空输入框
-    }
-  });
-  // console.log(refsMap.value[0].value)
-  // refsMap.value[0].value.clearSelection();
-  // table_0value!.clearSelection().
-  // console.log(checkList)
+function btn() {
+  console.log(selectOriginList)
 }
+
 /**
  * 未知的变量
  */
@@ -251,42 +249,97 @@ const dropdown3 = ref<DropdownInstance>()
  * 下面三个是选择框相关的
  */
 const allCheck = ref(false)
-const isIndeterminate=ref(false)
-let selectList1=[[],[],[],[]];
+const isIndeterminate = ref(false)
+/**
+ * 单个邮件复选框被点击的逻辑
+ * @param index 当前table索引
+ * @param item 当前数据
+ * 解释一下为什么不使用一个list
+ * 因为每一个table都会返回一个当前的选中数据，直接赋值是比较方便的，如果要进行增删，需要遍历判断
+ * 如果节省性能的话，也可以使用之前调用getSelectList()
+ */
+let selectOriginList = [[], [], [], []];
+let selectList: any[] = []
 
-function selectionChange(index:Number|any ,e: any){
-  selectList1[index]=toRaw(e)
-
-}
-function allCheckChange(){
-  if(allCheck.value==false){
-    //非全选变全选
-    isIndeterminate.value=false;
-    allCheck.value=true
-
-  }else if(allCheck.value==true){
-    //全选变不选
-    allCheck.value=false;
-    isIndeterminate.value=false;
-    table_0.value!.clearSelection()
+function selectionChange(index: Number | any, item: any) {
+  selectOriginList[index] = toRaw(item)
+  let sum = 0;
+  Object.values(selectOriginList).forEach(list => {
+    sum += list.length
+  });
+  if (sum == currentTotal.value) {
+    isIndeterminate.value = false;
+    allCheck.value = true;
+    return;
   }
+  if (sum == 0) {
+    isIndeterminate.value = false;
+    allCheck.value = false
+    return;
+  }
+  isIndeterminate.value = true;
+  allCheck.value = false
+  getSelectList()
+}
+
+/**
+ * 从selectOriginList更新selectList列表
+ */
+function getSelectList() {
+  selectList = []
+  Object.values(selectOriginList).forEach(list => {
+    //时间复杂度为4*n,O(n)=n
+    list.forEach(item => {
+      selectList.push(item);
+    })
+  });
+}
+
+/**
+ * 全选复选框的点击事件
+ */
+function allCheckChange() {
+  if (allCheck.value == false) {
+    //非全选变全选
+    isIndeterminate.value = false;
+    allCheck.value = true
+    Object.values(refsMap.value).forEach((list: any) => {
+      if (list) {
+        list.data.forEach((row: any) => {
+          list.toggleRowSelection(row, true); // 全选
+        })
+      }
+    });
+  } else if (allCheck.value == true) {
+    //全选变不选
+    allCheck.value = false;
+    isIndeterminate.value = false;
+    Object.values(refsMap.value).forEach((list: any) => {
+      if (list) {
+        list.clearSelection(); // 清空输入框
+      }
+    });
+  }
+  allCheck.value = !allCheck.value
+  getSelectList()
 }
 
 
 //表格数据
-const data = reactive([] as any)
+const data = ref([] as any)
 const checkList = ref([] as any[])
 
-const table_0 = ref<InstanceType<typeof ElTable>>()
 let reportVisible = ref()
 const report = ref()
 const currentRightClick = ref()
 let group: any;
 let isRightReport = ref(false)
 
+/**
+ * 举报邮件提交函数
+ */
 function reportSubmit() {
   if (report.value == null || report.value == "") {
-
     ElMessage.warning("您没有选择原因")
     return
   }
@@ -330,8 +383,6 @@ function showClick(e: any) {
 }
 
 
-let selectList: any;
-
 /**
  * 页码相关的
  */
@@ -339,17 +390,18 @@ let currentPage = ref()
 let totalPages = ref()
 let pages = ref()
 let size = ref(20)
+let currentTotal = ref(0)
 
 function getMessageList(flag = false, page = 1, size = 20) {
   axios.get("/api/email/getEmailByGroup?group=" + group + "&page=" + page + "&size=" + size).then(res => {
     if (res.data.flag === true) {
-      data.push(res.data.data.data.pinnedEmailList)
-      data.push(res.data.data.data.todayEmailList)
-      data.push(res.data.data.data.yesterdayEmailLis)
-      data.push(res.data.data.data.previousEmailList)
-      // console.log(data.previousEmailList)
+      data.value[0] = (res.data.data.data.pinnedEmailList)
+      data.value[1] = (res.data.data.data.todayEmailList)
+      data.value[2] = (res.data.data.data.yesterdayEmailLis)
+      data.value[3] = (res.data.data.data.previousEmailList)
       pages.value = res.data.data.pages == 0 ? 1 : res.data.data.pages
       currentPage.value = res.data.data.current
+      currentTotal.value = res.data.data.currentTotal
       if (flag) {
         ElMessage.success("刷新成功")
       }
@@ -372,10 +424,11 @@ const moveEmailGroup = (group: any) => {
 
 onBeforeMount(() => {
   group = route.currentRoute.value.query.group
+  data.value = [[], [], [], []]
   getMessageList()
 })
 
-const emailClick = (e:any) => {
+const emailClick = (e: any) => {
   router.push({
     path: '/emailDetail',
     query: {
@@ -409,10 +462,6 @@ function deleteEmail() {
       ElMessage.error(e.data.message)
     }
   });
-}
-
-function select(e: any) {
-  selectList = toRaw(e)
 }
 
 function ifNotSelect() {
@@ -589,5 +638,11 @@ const menus = shallowRef({
   display: inline-block;
   font-size: 20px;
   width: 100%;
+}
+.line {
+  width: 98%;
+  height: 0.5px;
+  background: #c2d3f4;
+  margin: 0;
 }
 </style>

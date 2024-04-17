@@ -14,4 +14,5 @@ import lombok.EqualsAndHashCode;
 @Data
 public class MPage<T> extends Page<T> {
     T data;
+    long currentTotal;
 }

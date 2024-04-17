@@ -14,4 +14,7 @@ public interface EmailMapper extends BaseMapper<Email> {
             "and pinned =0 and del_flag=0 and `group` =#{group} order by  update_time " +
             "LIMIT #{index},#{size}")
     List<Email>selectOtherEmail(@Param("master") String master,@Param("group") String group, @Param("index") int index,@Param("size") int size);
+    @Select("select count(*) from t_email where `master` = #{master} " +
+            "and pinned =0 and del_flag=0 and `group` =#{group} ")
+    long selectOtherEmailSum(@Param("master") String master,@Param("group") String group);
 }

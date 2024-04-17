@@ -188,6 +188,8 @@ public class EmailServiceImpl implements EmailService {
         List<Email>pinnedEmails=new ArrayList<>();
         List<Email>otherEmails=new ArrayList<>();
         IPage<Email> emails=new Page<>(1,10);
+        //查询置顶后，查询的总数
+        long otherSize=0;
         if(page==1){
             //需要置顶
             queryWrapper.eq(Email::getMaster, UserContext.getUserMail())
@@ -197,8 +199,11 @@ public class EmailServiceImpl implements EmailService {
                     .orderByDesc(Email::getUpdateTime);
             pinnedEmails=emailMapper.selectList(queryWrapper);
             int pinnedSize=pinnedEmails.size();
+            //置顶邮件<=size
             if(pinnedSize<size) {
-                otherEmails=emailMapper.selectOtherEmail(UserContext.getUserMail(), group,pinnedSize,size-pinnedSize);
+                //执行到这里，page一定等于1
+                otherEmails=emailMapper.selectOtherEmail(UserContext.getUserMail(), group,0,size-pinnedSize);
+                otherSize=emailMapper.selectOtherEmailSum(UserContext.getUserMail(), group);
             }
         }else{
             //不可能查出来置顶邮件
@@ -211,6 +216,7 @@ public class EmailServiceImpl implements EmailService {
             IPage<Email> ipage = new Page<>(page, size);
             emails = emailMapper.selectPage(ipage, queryWrapper);
             otherEmails=emails.getRecords();
+            otherSize=emails.getTotal();
         }
 
 
@@ -249,10 +255,11 @@ public class EmailServiceImpl implements EmailService {
         //因为是对象类型，所以需要自定义分页
         MPage<EmailResp> respIPage = new MPage<>();
         respIPage.setData(emailResp);
-        respIPage.setTotal(emails.getTotal());
+        respIPage.setTotal(otherSize+pinnedEmails.size());
         respIPage.setCurrent(emails.getCurrent());
         respIPage.setSize(emails.getSize());
         respIPage.setPages(emails.getPages());
+        respIPage.setCurrentTotal(pinnedEmails.size()+otherEmails.size());
         return Result.success(respIPage);
     }
 

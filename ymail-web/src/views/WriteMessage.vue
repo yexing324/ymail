@@ -100,7 +100,7 @@ let data = ref({
   attachments:[]
 })
 
-let from = "yexing195@163.com"
+let from = "yexing195@pmail.slovety.top"
 const send = () => {
   data.value.from = from
   data.value.htmlText = editor.getHtml()
