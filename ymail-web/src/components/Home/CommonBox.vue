@@ -59,8 +59,7 @@
       </el-button>
 
       <el-dropdown ref="dropdown1" trigger="contextmenu" style="margin-left: 12px">
-        <el-button @click="showClick(1)" text class="btn"
-                   style="  border: 1px solid #b7bcc7; font-size: 13px;width: 80px">
+        <el-button @click="showClick(1)" text class="btn" style="border: 1px solid #b7bcc7; font-size: 13px;width: 80px">
           标记为
           <el-icon>
             <arrow-down/>
@@ -72,8 +71,19 @@
             <el-dropdown-item @click="markNotRead">未读</el-dropdown-item>
             <el-dropdown-item @click="markAllRead">全部设置为已读</el-dropdown-item>
             <el-dropdown-item disabled>待办邮件</el-dropdown-item>
-            <el-dropdown-item >
-              显示 >
+            <el-dropdown-item>
+              <el-dropdown placement="right-start">
+          <span>
+            标记为&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>
+          </span>
+                <template #dropdown>
+                  <el-dropdown-menu >
+                    <el-dropdown-item @click="markRead">红</el-dropdown-item>
+                    <el-dropdown-item @click="markNotRead">黄</el-dropdown-item>
+                    <el-dropdown-item @click="markAllRead">蓝</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
             </el-dropdown-item>
             <el-dropdown-item @click="setEmailsPinned">置顶邮件</el-dropdown-item>
             <el-dropdown-item @click="cancelSetEmailsPinned">取消置顶</el-dropdown-item>
