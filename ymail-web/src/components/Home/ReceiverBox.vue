@@ -147,7 +147,7 @@
 
     <template v-for="(item ,index) in data">
       <div v-if="item.length!=0">
-        <div  style="text-align: left;margin: 9px 0 3px 9px;font-size: 13px;">
+        <div v-if="group=='收件箱'"  style="text-align: left;margin: 9px 0 3px 9px;font-size: 13px;">
           <span v-if="index==0">置顶</span>
           <span v-if="index==1">今天</span>
           <span v-if="index==2">昨天</span>
@@ -220,6 +220,7 @@ import router from "@/router";
 import {shallowRef} from "vue";
 import {menusEvent} from 'vue3-menus';
 import route from "@/router";
+import title from "@/components/Home/title.vue";
 //存放几个table的实例
 const refsMap = ref({} as any);
 
@@ -378,8 +379,6 @@ function showClick(e: any) {
     if (!dropdown3.value) return
     dropdown3.value.handleOpen()
   }
-
-
 }
 
 

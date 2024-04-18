@@ -67,4 +67,13 @@ public class EmailController {
     public Result<Void> reportEmail(@RequestBody List<Email> emails,String reason){
         return emailService.reportEmail(emails,reason);
     }
+    @PostMapping("/setEmailPinned")
+    public Result<Void> setEmailPinned(@RequestBody List<Email> emails,String group){
+        return emailService.setEmailPinned(emails,group);
+    }
+
+    @PostMapping("/cancelSetEmailPinned")
+    public Result<Void> cancelSetEmailPinned(@RequestBody List<Email> emails,String group){
+        return emailService.cancelSetEmailPinned(emails,group);
+    }
 }

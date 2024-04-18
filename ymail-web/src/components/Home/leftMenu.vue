@@ -22,7 +22,7 @@ const handleNodeClick = (e: { label: any; }) => {
   switch (label) {
     case "收件箱":
       router.push({
-        path:'/receiveBox',
+        path:'/commonBox',
         query:{
           group:"收件箱"
         }

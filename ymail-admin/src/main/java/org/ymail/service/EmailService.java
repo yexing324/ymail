@@ -35,4 +35,7 @@ public interface EmailService {
     Result<Void> reportEmail(List<Email> email,String reason);
 
 
+    Result<Void> setEmailPinned(List<Email> setEmailPinnedList,String group);
+
+    Result<Void> cancelSetEmailPinned(List<Email> emails, String group);
 }
