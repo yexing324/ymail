@@ -59,7 +59,8 @@
       </el-button>
 
       <el-dropdown ref="dropdown1" trigger="contextmenu" style="margin-left: 12px">
-        <el-button @click="showClick(1)" text class="btn" style="border: 1px solid #b7bcc7; font-size: 13px;width: 80px">
+        <el-button @click="showClick(1)" text class="btn"
+                   style="border: 1px solid #b7bcc7; font-size: 13px;width: 80px">
           标记为
           <el-icon>
             <arrow-down/>
@@ -77,14 +78,20 @@
             标记为&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>
           </span>
                 <template #dropdown>
-                  <el-dropdown-menu >
-                    <el-dropdown-item @click="markRead">红</el-dropdown-item>
-                    <el-dropdown-item @click="markNotRead">黄</el-dropdown-item>
-                    <el-dropdown-item @click="markAllRead">蓝</el-dropdown-item>
+                  <el-dropdown-menu>
+                    <el-dropdown-item @click="markEmailColor('green')" class="green_class">绿色</el-dropdown-item>
+                    <el-dropdown-item @click="markEmailColor('orange')" class="orange_class">橙色</el-dropdown-item>
+                    <el-dropdown-item @click="markEmailColor('blue')" class="blue_class">蓝色</el-dropdown-item>
+                    <el-dropdown-item @click="markEmailColor('pink')" class="pink_class">粉色</el-dropdown-item>
+                    <el-dropdown-item @click="markEmailColor('indigo')" class="indigo_class">青色</el-dropdown-item>
+                    <el-dropdown-item @click="markEmailColor('yellow')" class="yellow_class">黄色</el-dropdown-item>
+                    <el-dropdown-item @click="markEmailColor('purple')" class="purple_class">紫色</el-dropdown-item>
+                    <el-dropdown-item @click="markEmailColor('grey')" class="grey_class">灰色</el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
             </el-dropdown-item>
+            <el-dropdown-item @click="markEmailColor('black')">取消标记</el-dropdown-item>
             <el-dropdown-item @click="setEmailsPinned">置顶邮件</el-dropdown-item>
             <el-dropdown-item @click="cancelSetEmailsPinned">取消置顶</el-dropdown-item>
           </el-dropdown-menu>
@@ -161,7 +168,7 @@
 
     <template v-for="(item ,index) in data">
       <div v-if="item.length!=0">
-        <div v-if="group=='收件箱'"  style="text-align: left;margin: 9px 0 3px 9px;font-size: 13px;">
+        <div v-if="group=='收件箱'" style="text-align: left;margin: 9px 0 3px 9px;font-size: 13px;">
           <span v-if="index==0">置顶</span>
           <span v-if="index==1">今天</span>
           <span v-if="index==2">昨天</span>
@@ -179,7 +186,7 @@
             style="text-align: left"
             :show-header="false"
             @selectionChange="selectionChange(index,$event)"
-
+            :row-class-name="rowStyle"
         >
           <el-table-column type="selection" width="30"/>
 
@@ -408,13 +415,13 @@ let currentTotal = ref(0)
 function getMessageList(flag = false, page = 1, size = 20) {
   axios.get("/api/email/getEmailByGroup?group=" + group + "&page=" + page + "&size=" + size).then(res => {
     if (res.data.flag === true) {
-      if(group=="收件箱") {
+      if (group == "收件箱") {
         data.value[0] = (res.data.data.data.pinnedEmailList)
         data.value[1] = (res.data.data.data.todayEmailList)
         data.value[2] = (res.data.data.data.yesterdayEmailLis)
         data.value[3] = (res.data.data.data.previousEmailList)
         currentTotal.value = res.data.data.currentTotal
-      }else{
+      } else {
         data.value[0] = (res.data.data.records)
         currentTotal.value = res.data.data.total
       }
@@ -638,9 +645,9 @@ const menus = shallowRef({
 /**
  * 设置邮件置顶
  */
-function setEmailsPinned(){
-  if(ifNotSelect()) return
-  axios.post("/api/email/setEmailPinned?group="+group, selectList).then(e => {
+function setEmailsPinned() {
+  if (ifNotSelect()) return
+  axios.post("/api/email/setEmailPinned?group=" + group, selectList).then(e => {
     if (e.data.flag == true) {
       ElMessage.success("置顶成功")
       getMessageList();
@@ -649,9 +656,10 @@ function setEmailsPinned(){
     }
   })
 }
-function cancelSetEmailsPinned(){
-  if(ifNotSelect()) return
-  axios.post("/api/email/cancelSetEmailPinned?group="+group, selectList).then(e => {
+
+function cancelSetEmailsPinned() {
+  if (ifNotSelect()) return
+  axios.post("/api/email/cancelSetEmailPinned?group=" + group, selectList).then(e => {
     if (e.data.flag == true) {
       ElMessage.success("取消成功")
       getMessageList();
@@ -674,6 +682,35 @@ const options = [
   },
 
 ]
+
+function markEmailColor(color: string) {
+  if (ifNotSelect()) return
+  axios.post("/api/email/markEmailColor?color=" + color, selectList).then(e => {
+    if (e.data.flag == true) {
+      if (color == "black")
+        ElMessage.success("取消成功")
+      else
+        ElMessage.success("标记成功")
+      getMessageList();
+    } else {
+      ElMessage.error(e.data.message)
+    }
+  })
+}
+
+/**
+ * 判断当前的颜色
+ * @param row
+ * @param rowIndex
+ */
+function rowStyle(row: any) {
+  let color = toRaw(row.row).color
+  console.log(color)
+  if (typeof (color) == "undefined") {
+    return "black_class";
+  }
+  return color + "_class";
+}
 
 </script>
 <style>
@@ -707,10 +744,47 @@ const options = [
   font-size: 20px;
   width: 100%;
 }
+
 .line {
   width: 98%;
   height: 0.5px;
   background: #c2d3f4;
   margin: 0;
+}
+
+.black_class {
+  color: black;
+}
+
+.green_class {
+  color: green;
+}
+
+.orange_class {
+  color: orange;
+}
+
+.blue_class {
+  color: blue;
+}
+
+.pink_class {
+  color: pink;
+}
+
+.indigo_class {
+  color: indigo;
+}
+
+.yellow_class {
+  color: #b7b73e;
+}
+
+.purple_class {
+  color: purple;
+}
+
+.grey_class {
+  color: grey;
 }
 </style>

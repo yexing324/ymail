@@ -76,4 +76,8 @@ public class EmailController {
     public Result<Void> cancelSetEmailPinned(@RequestBody List<Email> emails,String group){
         return emailService.cancelSetEmailPinned(emails,group);
     }
+    @PostMapping("/markEmailColor")
+    public Result<Void> markEmailColor(@RequestBody List<Email> emails,String color){
+        return emailService.markEmailColor(emails,color);
+    }
 }

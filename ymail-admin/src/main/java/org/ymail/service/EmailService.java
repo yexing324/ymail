@@ -38,4 +38,7 @@ public interface EmailService {
     Result<Void> setEmailPinned(List<Email> setEmailPinnedList,String group);
 
     Result<Void> cancelSetEmailPinned(List<Email> emails, String group);
+
+    Result<Void> markEmailColor(List<Email> emails, String color);
+
 }

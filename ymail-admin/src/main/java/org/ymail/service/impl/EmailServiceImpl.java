@@ -361,4 +361,19 @@ public class EmailServiceImpl implements EmailService {
         );
         return Result.success();
     }
+
+    @Override
+    public Result<Void> markEmailColor(List<Email> emails, String color) {
+        if (emails == null || emails.isEmpty()) {
+            return Result.failure("所选择的邮件列表为空");
+        }
+        emails.forEach(
+                e -> {
+                    e.setColor(color);
+                    emailMapper.updateById(e);
+                }
+        );
+        return Result.success();
+    }
+
 }
