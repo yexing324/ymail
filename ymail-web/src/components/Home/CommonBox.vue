@@ -37,6 +37,32 @@
       </div>
     </template>
   </el-dialog>
+  <el-dialog
+      v-model="createFolderAndMoveEmail"
+      title="创建文件夹并移动"
+      width="400"
+  >
+
+
+    <template #title>
+      <h3 class="report">新建文件夹:</h3>
+    </template>
+    <template #default>
+      <span>输入文件夹名称:
+      <el-input v-model="commonData.createEmailFolder" style="width: 250px"/>
+      </span>
+    </template>
+
+
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="createFolderAndMoveEmail = false">取消</el-button>
+        <el-button type="primary" @click="createFolderAndMoveEmailSubmit()">
+          提交
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
 
 
   <div style="overflow:hidden;">
@@ -112,7 +138,7 @@
             <el-dropdown-item @click="moveEmailGroup('已发送')">已发送</el-dropdown-item>
             <el-dropdown-item @click="moveEmailGroup('已删除')">已删除</el-dropdown-item>
             <el-dropdown-item @click="moveEmailGroup('垃圾邮件')">垃圾邮件</el-dropdown-item>
-            <el-dropdown-item @click="moveEmailGroup('')" divided>新建文件夹并移动</el-dropdown-item>
+            <el-dropdown-item @click="createFolderAndMoveEmail=true" >新建文件夹并移动</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -165,50 +191,52 @@
   <el-scrollbar
       style="height: 100%;text-align: center"
   >
+    <div style="min-height: 400px">
+      <template v-for="(item ,index) in data">
+        <div v-if="item.length!=0">
+          <div v-if="group=='收件箱'" style="text-align: left;margin: 9px 0 3px 9px;font-size: 13px;">
+            <span v-if="index==0">置顶</span>
+            <span v-if="index==1">今天</span>
+            <span v-if="index==2">昨天</span>
+            <span v-if="index==3">更早</span>
+            <el-divider class="line" style="margin-top: 3px;"></el-divider>
+          </div>
 
-    <template v-for="(item ,index) in data">
-      <div v-if="item.length!=0">
-        <div v-if="group=='收件箱'" style="text-align: left;margin: 9px 0 3px 9px;font-size: 13px;">
-          <span v-if="index==0">置顶</span>
-          <span v-if="index==1">今天</span>
-          <span v-if="index==2">昨天</span>
-          <span v-if="index==3">更早</span>
-          <el-divider class="line" style="margin-top: 3px;"></el-divider>
+
+          <el-table
+              :ref="setRef(index)"
+              :data="item"
+              @rowClick="emailClick"
+              @row-contextmenu="row_rightClick($event)"
+              @contextmenu="rightClick($event)"
+              style="text-align: left"
+              :show-header="false"
+              @selectionChange="selectionChange(index,$event)"
+              :row-class-name="rowStyle"
+          >
+            <el-table-column type="selection" width="30"/>
+
+            <el-table-column width="50">
+              <template #default="{ row }">
+                <!--                          <span v-if="row.statusText == '未读'">-->
+                <!--                            <el-icon style="margin-top: 6px;"><Message/></el-icon>-->
+                <!--                          </span>-->
+              </template>
+            </el-table-column>
+
+            <el-table-column prop="nickname" label="发件人" width="150"/>
+            <el-table-column prop="subject" label="主题" width="150"/>
+            <el-table-column prop="plainText" label="内容" style="overflow: hidden;height: 200px" class="notEnter"/>
+            <el-table-column prop="createTime" width="360"/>
+
+          </el-table>
         </div>
+      </template>
+
+    </div>
 
 
-        <el-table
-            :ref="setRef(index)"
-            :data="item"
-            @rowClick="emailClick"
-            @row-contextmenu="row_rightClick($event)"
-            @contextmenu="rightClick($event)"
-            style="text-align: left"
-            :show-header="false"
-            @selectionChange="selectionChange(index,$event)"
-            :row-class-name="rowStyle"
-        >
-          <el-table-column type="selection" width="30"/>
-
-          <el-table-column width="50">
-            <template #default="{ row }">
-              <!--                          <span v-if="row.statusText == '未读'">-->
-              <!--                            <el-icon style="margin-top: 6px;"><Message/></el-icon>-->
-              <!--                          </span>-->
-            </template>
-          </el-table-column>
-
-          <el-table-column prop="nickname" label="发件人" width="150"/>
-          <el-table-column prop="subject" label="主题" width="150"/>
-          <el-table-column prop="plainText" label="内容" style="overflow: hidden;height: 200px" class="notEnter"/>
-          <el-table-column prop="createTime" width="360"/>
-
-        </el-table>
-      </div>
-    </template>
-
-
-    <div style="height: 100px;margin-top: 20px">
+    <div style="height: 100px;margin-top: 20px;">
       <el-button-group>
         <el-button @click="pageChange(-1)" :disabled="currentPage==1" :icon="ArrowLeft">上一页</el-button>
         <el-button @click="pageChange(+1)" :disabled="currentPage==pages">
@@ -352,6 +380,12 @@ const data = ref([] as any)
 const checkList = ref([] as any[])
 
 let reportVisible = ref()
+let commonData = ref(
+    {
+      createEmailFolder: ""
+    }
+)
+let createFolderAndMoveEmail = ref()
 const report = ref()
 const currentRightClick = ref()
 let group: any;
@@ -705,13 +739,26 @@ function markEmailColor(color: string) {
  */
 function rowStyle(row: any) {
   let color = toRaw(row.row).color
-  console.log(color)
   if (typeof (color) == "undefined") {
     return "black_class";
   }
   return color + "_class";
 }
-
+function createFolderAndMoveEmailSubmit(){
+  createFolderAndMoveEmail.value=false
+  if(commonData.value.createEmailFolder==""){
+    ElMessage.warning("请输入要创建的文件夹哦")
+    return
+  }
+  axios.post("/api/email/createEmailFolder?group="+commonData.value.createEmailFolder ,  selectList).then(e => {
+    if (e.data.flag == true) {
+        ElMessage.success("创建成功")
+        getMessageList();
+    } else {
+      ElMessage.error(e.data.message)
+    }
+  })
+}
 </script>
 <style>
 

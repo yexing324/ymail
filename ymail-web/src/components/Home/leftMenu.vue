@@ -1,18 +1,61 @@
 <script lang="ts" setup>
-import {onBeforeMount, toRaw} from "vue";
+import {onBeforeMount, ref, toRaw} from "vue";
 import store from "@/store";
 import router from "@/router";
 import {EditPen, MessageBox} from "@element-plus/icons-vue";
+import axios from "axios";
+import {ElMessage} from "element-plus";
 
-let menu1,menu2
+const data=ref({
+  menu1:[],
+  menu2:[{
+    "children":[] as any
+  }]
+})
+let originMenu2=[
+  {
+    label: '其他文件夹',
+    children: [
+      {
+        label: '已删除',
+      },
+      {
+        label: '垃圾箱',
+      },
+    ],
+  },
+  {
+    label: '附件管理',
+    children: [
+      {
+        label: '超大附件',
+      },
+      {
+        label: '邮箱附件',
+      },
+    ],
+  },
+]
 onBeforeMount(() => {
   //TODO:判断cookie状态
   //初始化菜单
-  menu1 = toRaw(store.getters.getMenu1)
-  menu2 = toRaw(store.getters.getMenu2)
+  data.value.menu1 = toRaw(store.getters.getMenu1)
+  data.value.menu2 = originMenu2
   //初始化数据
+  getGroupList()
+
 
 })
+function getGroupList(){
+  axios.get("/api/email/getGroupList").then(e => {
+    data.value.menu2=originMenu2
+    Object.values(toRaw(e.data.data)).forEach((indexItem:any)=>{
+      let item={"label":""}
+      item.label=indexItem.name
+      data.value.menu2[0]['children'].push(item)
+    })
+  })
+}
 const write=()=>{
   router.push('/write')
 }
@@ -76,6 +119,14 @@ const handleNodeClick = (e: { label: any; }) => {
         }
       })
       break;
+    default:
+      router.push({
+        path:'/commonBox',
+        query:{
+          group:label
+        }
+      })
+      break;
   }
 }
 const defaultProps = {
@@ -100,7 +151,7 @@ const defaultProps = {
     <el-tree
         style="margin-top:10px "
         highlight-current
-        :data="menu1"
+        :data="data.menu1"
         :props="defaultProps"
         @node-click="handleNodeClick">
     </el-tree>
@@ -109,7 +160,7 @@ const defaultProps = {
 
     <el-tree
         style="margin-top:10px "
-        :data="menu2"
+        :data="data.menu2"
         :props="defaultProps"
         @node-click="handleNodeClick">
     </el-tree>

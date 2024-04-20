@@ -1,6 +1,7 @@
 package org.ymail.service;
 
 import org.ymail.entity.Email;
+import org.ymail.entity.Group;
 import org.ymail.resp.EmailBo;
 import org.ymail.util.Result;
 
@@ -41,4 +42,7 @@ public interface EmailService {
 
     Result<Void> markEmailColor(List<Email> emails, String color);
 
+    Result<Void> createEmailFolder(List<Email> emails, String group);
+
+    Result<List<Group>> getGroupList();
 }

@@ -6,16 +6,19 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.springframework.stereotype.Service;
 import org.ymail.entity.Attachment;
 import org.ymail.entity.Email;
 import org.ymail.entity.EmailReport;
+import org.ymail.entity.Group;
 import org.ymail.enums.EmailGroup;
 import org.ymail.enums.EmailStatus;
 import org.ymail.filter.UserContext;
 import org.ymail.mapper.AttachMapper;
 import org.ymail.mapper.EmailMapper;
 import org.ymail.mapper.EmailReportMapper;
+import org.ymail.mapper.GroupMapper;
 import org.ymail.resp.EmailBo;
 import org.ymail.resp.EmailResp;
 import org.ymail.service.EmailService;
@@ -39,6 +42,7 @@ public class EmailServiceImpl implements EmailService {
     private final EmailMapper emailMapper;
     private final AttachMapper attachMapper;
     private final EmailReportMapper emailReportMapper;
+    private final GroupMapper groupMapper;
 
     /**
      * 获得用户登录时的具体信息
@@ -375,5 +379,39 @@ public class EmailServiceImpl implements EmailService {
         );
         return Result.success();
     }
+
+    @Override
+    public Result<Void> createEmailFolder(List<Email> emails, String group) {
+        if (StrUtil.isBlank(group)) {
+            return Result.failure("文件夹名称不能为空");
+        }
+        //前端先检查一遍
+        Group ifGroupExist = groupMapper.selectOne(new LambdaQueryWrapper<Group>()
+                .eq(Group::getMaster, UserContext.getUserMail())
+                .eq(Group::getName, group));
+        if (ifGroupExist != null) {
+            return Result.failure("文件夹已经存在");
+        }
+        val insertGroup = new Group();
+        insertGroup.setName(group);
+        insertGroup.setMaster(UserContext.getUserMail());
+        insertGroup.setCount(0);
+        int insert = groupMapper.insert(insertGroup);
+        if(insert<=0){
+            return Result.failure("创建文件夹失败，请重试");
+        }
+        if (!emails.isEmpty()) {
+            moveEmailGroup(emails, group);
+        }
+        return Result.success();
+    }
+
+    @Override
+    public Result<List<Group>> getGroupList() {
+        List<Group> groupList = groupMapper.selectList(new LambdaQueryWrapper<Group>()
+                .eq(Group::getMaster, UserContext.getUserMail()));
+        return Result.success(groupList);
+    }
+
 
 }

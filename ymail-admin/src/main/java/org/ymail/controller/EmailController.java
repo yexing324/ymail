@@ -3,6 +3,7 @@ package org.ymail.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.ymail.entity.Email;
+import org.ymail.entity.Group;
 import org.ymail.enums.EmailGroup;
 import org.ymail.resp.EmailBo;
 import org.ymail.service.EmailService;
@@ -79,5 +80,13 @@ public class EmailController {
     @PostMapping("/markEmailColor")
     public Result<Void> markEmailColor(@RequestBody List<Email> emails,String color){
         return emailService.markEmailColor(emails,color);
+    }
+    @PostMapping("/createEmailFolder")
+    public Result<Void> createEmailFolder(@RequestBody List<Email> emails,String group){
+        return emailService.createEmailFolder(emails,group);
+    }
+    @GetMapping("/getGroupList")
+    public Result<List<Group>> getGroupList(){
+        return emailService.getGroupList();
     }
 }
