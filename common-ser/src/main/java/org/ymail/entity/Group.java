@@ -2,6 +2,7 @@ package org.ymail.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.ymail.database.BaseDO;
 
 import java.util.Date;
@@ -9,6 +10,7 @@ import java.util.Date;
 /**
  * 邮件分组
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @TableName("t_group")
 public class Group extends BaseDO {

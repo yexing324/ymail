@@ -386,11 +386,17 @@ public class EmailServiceImpl implements EmailService {
             return Result.failure("文件夹名称不能为空");
         }
         //前端先检查一遍
-        Group ifGroupExist = groupMapper.selectOne(new LambdaQueryWrapper<Group>()
+        LambdaQueryWrapper<Group> queryWrapper = new LambdaQueryWrapper<Group>()
                 .eq(Group::getMaster, UserContext.getUserMail())
-                .eq(Group::getName, group));
+                .eq(Group::getName, group);
+        Group ifGroupExist = groupMapper.selectOne(queryWrapper);
         if (ifGroupExist != null) {
             return Result.failure("文件夹已经存在");
+        }
+        LambdaQueryWrapper<Group> queryCountWrapper = new LambdaQueryWrapper<Group>()
+                .eq(Group::getMaster, UserContext.getUserMail());
+        if(groupMapper.selectCount(queryCountWrapper)>=6){
+            return Result.failure("最多允许创建6个文件夹");
         }
         val insertGroup = new Group();
         insertGroup.setName(group);

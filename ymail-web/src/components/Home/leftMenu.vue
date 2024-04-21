@@ -4,59 +4,44 @@ import store from "@/store";
 import router from "@/router";
 import {EditPen, MessageBox} from "@element-plus/icons-vue";
 import axios from "axios";
-import {ElMessage} from "element-plus";
+import _ from 'lodash'
+import eventBus from "@/assets/util/eventBus"
 
-const data=ref({
-  menu1:[],
-  menu2:[{
-    "children":[] as any
-  }]
+const data = ref({
+  menu1: [],
+  menu2: [] as any
 })
-let originMenu2=[
-  {
-    label: '其他文件夹',
-    children: [
-      {
-        label: '已删除',
-      },
-      {
-        label: '垃圾箱',
-      },
-    ],
-  },
-  {
-    label: '附件管理',
-    children: [
-      {
-        label: '超大附件',
-      },
-      {
-        label: '邮箱附件',
-      },
-    ],
-  },
-]
+let originMenu2: any[]=[];
 onBeforeMount(() => {
   //TODO:判断cookie状态
   //初始化菜单
   data.value.menu1 = toRaw(store.getters.getMenu1)
-  data.value.menu2 = originMenu2
+  originMenu2 = toRaw(store.getters.getMenu2)
+  //进行深拷贝，防止出现数据错误
+  data.value.menu2 = _.cloneDeep(originMenu2)
   //初始化数据
   getGroupList()
+  //事件绑定器，允许其他页面调用update函数
+  eventBus.on('updateGroup', () => {
+    getGroupList()
+  })
 
 
 })
-function getGroupList(){
+
+
+function getGroupList() {
   axios.get("/api/email/getGroupList").then(e => {
-    data.value.menu2=originMenu2
-    Object.values(toRaw(e.data.data)).forEach((indexItem:any)=>{
-      let item={"label":""}
-      item.label=indexItem.name
+    data.value.menu2 = _.cloneDeep(originMenu2)
+    Object.values(toRaw(e.data.data)).forEach((indexItem: any) => {
+      let item = {"label": ""}
+      item.label = indexItem.name
       data.value.menu2[0]['children'].push(item)
     })
   })
 }
-const write=()=>{
+
+const write = () => {
   router.push('/write')
 }
 const handleNodeClick = (e: { label: any; }) => {
@@ -65,65 +50,65 @@ const handleNodeClick = (e: { label: any; }) => {
   switch (label) {
     case "收件箱":
       router.push({
-        path:'/commonBox',
-        query:{
-          group:"收件箱"
+        path: '/commonBox',
+        query: {
+          group: "收件箱"
         }
       })
       break;
     case "已发送":
       router.push({
-        path:'/commonBox',
-        query:{
-          group:"已发送"
+        path: '/commonBox',
+        query: {
+          group: "已发送"
         }
       })
       break;
     case "星标邮件":
       router.push({
-        path:'/commonBox',
-        query:{
-          group:"星标邮件"
+        path: '/commonBox',
+        query: {
+          group: "星标邮件"
         }
       })
       break;
     case "草稿箱":
       router.push({
-        path:'/commonBox',
-        query:{
-          group:"草稿箱"
+        path: '/commonBox',
+        query: {
+          group: "草稿箱"
         }
       })
       break;
     case "待办邮件":
       router.push({
-        path:'/commonBox',
-        query:{
-          group:"待办邮件"
+        path: '/commonBox',
+        query: {
+          group: "待办邮件"
         }
       })
       break;
     case "已删除":
       router.push({
-        path:'/commonBox',
-        query:{
-          group:"已删除"
+        path: '/commonBox',
+        query: {
+          group: "已删除"
         }
       })
       break;
     case "垃圾箱":
       router.push({
-        path:'/commonBox',
-        query:{
-          group:"垃圾邮件"
+        path: '/commonBox',
+        query: {
+          group: "垃圾邮件"
         }
       })
       break;
     default:
       router.push({
-        path:'/commonBox',
-        query:{
-          group:label
+        path: '/commonBox',
+        query: {
+          group: label
         }
       })
       break;
@@ -137,14 +122,18 @@ const defaultProps = {
 
 <template>
   <div style="height: 100vh;border-right: #c2d3f4 1px solid;text-align: left">
-      <el-button type="primary" class="topItem">
-        <el-icon><MessageBox /></el-icon>
-        收信
-      </el-button>
-      <el-button type="primary" class="topItem" @click="write">
-        <el-icon><EditPen /></el-icon>
-        写信
-      </el-button>
+    <el-button type="primary" class="topItem">
+      <el-icon>
+        <MessageBox/>
+      </el-icon>
+      收信
+    </el-button>
+    <el-button type="primary" class="topItem" @click="write">
+      <el-icon>
+        <EditPen/>
+      </el-icon>
+      写信
+    </el-button>
     <br/>
 
 
@@ -178,18 +167,19 @@ const defaultProps = {
   color: #3370ff;
   border-radius: 0;
   font-size: 18px;
-  font-family: "等线",serif;
+  font-family: "等线", serif;
   font-weight: bold;
   border-right: 0;
-  border-top:0;
+  border-top: 0;
   margin: 0;
 
 }
 
 .el-tree-node__label {
-  line-height:106px;
+  line-height: 106px;
 }
-.el-tree-node{
+
+.el-tree-node {
   margin-top: 60px;
 }
 

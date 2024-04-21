@@ -134,11 +134,24 @@
         </el-button>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item @click="moveEmailGroup('草稿箱')">草稿箱</el-dropdown-item>
-            <el-dropdown-item @click="moveEmailGroup('已发送')">已发送</el-dropdown-item>
-            <el-dropdown-item @click="moveEmailGroup('已删除')">已删除</el-dropdown-item>
-            <el-dropdown-item @click="moveEmailGroup('垃圾邮件')">垃圾邮件</el-dropdown-item>
-            <el-dropdown-item @click="createFolderAndMoveEmail=true" >新建文件夹并移动</el-dropdown-item>
+            <el-dropdown-item v-if="group!='收件箱'" @click="moveEmailGroup('收件箱')">收件箱</el-dropdown-item>
+            <el-dropdown-item v-if="group!='草稿箱'" @click="moveEmailGroup('草稿箱')">草稿箱</el-dropdown-item>
+            <el-dropdown-item v-if="group!='已发送'" @click="moveEmailGroup('已发送')">已发送</el-dropdown-item>
+            <el-dropdown-item v-if="group!='已删除'" @click="moveEmailGroup('已删除')">已删除</el-dropdown-item>
+            <el-dropdown-item v-if="group!='垃圾邮件'" @click="moveEmailGroup('垃圾邮件')">垃圾邮件</el-dropdown-item>
+            <el-dropdown-item>
+              <el-dropdown placement="right-start">
+          <span>
+            我的文件夹&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>
+          </span>
+                <template #dropdown>
+                  <el-dropdown-menu v-for="(item) in commonData.groupList">
+                    <el-dropdown-item v-if="group!=item.name" @click="moveEmailGroup(item.name)">{{ item.name }}</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </el-dropdown-item>
+            <el-dropdown-item @click="createFolderAndMoveEmail=true">新建文件夹并移动</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -270,8 +283,12 @@ import {shallowRef} from "vue";
 import {menusEvent} from 'vue3-menus';
 import route from "@/router";
 import title from "@/components/Home/title.vue";
+import leftMenu from "@/components/Home/leftMenu.vue";
 //存放几个table的实例
 const refsMap = ref({} as any);
+
+import eventBus from '@/assets/util/eventBus'
+import _ from "lodash";
 
 /**
  * 设置table的实例
@@ -382,7 +399,8 @@ const checkList = ref([] as any[])
 let reportVisible = ref()
 let commonData = ref(
     {
-      createEmailFolder: ""
+      createEmailFolder: "",
+      groupList:[]
     }
 )
 let createFolderAndMoveEmail = ref()
@@ -486,6 +504,7 @@ onBeforeMount(() => {
   group = route.currentRoute.value.query.group
   data.value = [[], [], [], []]
   getMessageList()
+  getGroupList()
 })
 
 const emailClick = (e: any) => {
@@ -717,6 +736,10 @@ const options = [
 
 ]
 
+/**
+ * 标记邮件颜色
+ * @param color
+ */
 function markEmailColor(color: string) {
   if (ifNotSelect()) return
   axios.post("/api/email/markEmailColor?color=" + color, selectList).then(e => {
@@ -737,6 +760,7 @@ function markEmailColor(color: string) {
  * @param row
  * @param rowIndex
  */
+
 function rowStyle(row: any) {
   let color = toRaw(row.row).color
   if (typeof (color) == "undefined") {
@@ -744,21 +768,34 @@ function rowStyle(row: any) {
   }
   return color + "_class";
 }
-function createFolderAndMoveEmailSubmit(){
-  createFolderAndMoveEmail.value=false
-  if(commonData.value.createEmailFolder==""){
+
+/**
+ * 创建文件夹并移动
+ */
+function createFolderAndMoveEmailSubmit() {
+  createFolderAndMoveEmail.value = false
+  if (commonData.value.createEmailFolder == "") {
     ElMessage.warning("请输入要创建的文件夹哦")
     return
   }
-  axios.post("/api/email/createEmailFolder?group="+commonData.value.createEmailFolder ,  selectList).then(e => {
+  axios.post("/api/email/createEmailFolder?group=" + commonData.value.createEmailFolder, selectList).then(e => {
     if (e.data.flag == true) {
-        ElMessage.success("创建成功")
-        getMessageList();
+      ElMessage.success("创建成功")
+      getMessageList();
+      eventBus.emit('updateGroup');
     } else {
       ElMessage.error(e.data.message)
     }
   })
 }
+
+function getGroupList() {
+  axios.get("/api/email/getGroupList").then(e => {
+    commonData.value.groupList=e.data.data
+  })
+}
+
+
 </script>
 <style>
 
