@@ -37,32 +37,6 @@
       </div>
     </template>
   </el-dialog>
-  <el-dialog
-      v-model="createFolderAndMoveEmail"
-      title="创建文件夹并移动"
-      width="400"
-  >
-
-
-    <template #title>
-      <h3 class="report">新建文件夹:</h3>
-    </template>
-    <template #default>
-      <span>输入文件夹名称:
-      <el-input v-model="commonData.createEmailFolder" style="width: 250px"/>
-      </span>
-    </template>
-
-
-    <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="createFolderAndMoveEmail = false">取消</el-button>
-        <el-button type="primary" @click="createFolderAndMoveEmailSubmit()">
-          提交
-        </el-button>
-      </div>
-    </template>
-  </el-dialog>
 
 
   <div style="overflow:hidden;">
@@ -86,7 +60,7 @@
 
       <el-dropdown ref="dropdown1" trigger="contextmenu" style="margin-left: 12px">
         <el-button @click="showClick(1)" text class="btn"
-                   style="border: 1px solid #b7bcc7; font-size: 13px;width: 80px">
+                   style="  border: 1px solid #b7bcc7; font-size: 13px;width: 80px">
           标记为
           <el-icon>
             <arrow-down/>
@@ -98,26 +72,9 @@
             <el-dropdown-item @click="markNotRead">未读</el-dropdown-item>
             <el-dropdown-item @click="markAllRead">全部设置为已读</el-dropdown-item>
             <el-dropdown-item disabled>待办邮件</el-dropdown-item>
-            <el-dropdown-item>
-              <el-dropdown placement="right-start">
-          <span>
-            标记为&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>
-          </span>
-                <template #dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item @click="markEmailColor('green')" class="green_class">绿色</el-dropdown-item>
-                    <el-dropdown-item @click="markEmailColor('orange')" class="orange_class">橙色</el-dropdown-item>
-                    <el-dropdown-item @click="markEmailColor('blue')" class="blue_class">蓝色</el-dropdown-item>
-                    <el-dropdown-item @click="markEmailColor('pink')" class="pink_class">粉色</el-dropdown-item>
-                    <el-dropdown-item @click="markEmailColor('indigo')" class="indigo_class">青色</el-dropdown-item>
-                    <el-dropdown-item @click="markEmailColor('yellow')" class="yellow_class">黄色</el-dropdown-item>
-                    <el-dropdown-item @click="markEmailColor('purple')" class="purple_class">紫色</el-dropdown-item>
-                    <el-dropdown-item @click="markEmailColor('grey')" class="grey_class">灰色</el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
+            <el-dropdown-item >
+              显示 >
             </el-dropdown-item>
-            <el-dropdown-item @click="markEmailColor('black')">取消标记</el-dropdown-item>
             <el-dropdown-item @click="setEmailsPinned">置顶邮件</el-dropdown-item>
             <el-dropdown-item @click="cancelSetEmailsPinned">取消置顶</el-dropdown-item>
           </el-dropdown-menu>
@@ -134,24 +91,11 @@
         </el-button>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item v-if="group!='收件箱'" @click="moveEmailGroup('收件箱')">收件箱</el-dropdown-item>
-            <el-dropdown-item v-if="group!='草稿箱'" @click="moveEmailGroup('草稿箱')">草稿箱</el-dropdown-item>
-            <el-dropdown-item v-if="group!='已发送'" @click="moveEmailGroup('已发送')">已发送</el-dropdown-item>
-            <el-dropdown-item v-if="group!='已删除'" @click="moveEmailGroup('已删除')">已删除</el-dropdown-item>
-            <el-dropdown-item v-if="group!='垃圾邮件'" @click="moveEmailGroup('垃圾邮件')">垃圾邮件</el-dropdown-item>
-            <el-dropdown-item>
-              <el-dropdown placement="right-start">
-          <span>
-            我的文件夹&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>
-          </span>
-                <template #dropdown>
-                  <el-dropdown-menu v-for="(item) in commonData.groupList">
-                    <el-dropdown-item v-if="group!=item.name" @click="moveEmailGroup(item.name)">{{ item.name }}</el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
-            </el-dropdown-item>
-            <el-dropdown-item @click="createFolderAndMoveEmail=true">新建文件夹并移动</el-dropdown-item>
+            <el-dropdown-item @click="moveEmailGroup('草稿箱')">草稿箱</el-dropdown-item>
+            <el-dropdown-item @click="moveEmailGroup('已发送')">已发送</el-dropdown-item>
+            <el-dropdown-item @click="moveEmailGroup('已删除')">已删除</el-dropdown-item>
+            <el-dropdown-item @click="moveEmailGroup('垃圾邮件')">垃圾邮件</el-dropdown-item>
+            <el-dropdown-item @click="moveEmailGroup('')" divided>新建文件夹并移动</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -204,52 +148,50 @@
   <el-scrollbar
       style="height: 100%;text-align: center"
   >
-    <div style="min-height: 400px">
-      <template v-for="(item ,index) in data">
-        <div v-if="item.length!=0">
-          <div v-if="group=='收件箱'" style="text-align: left;margin: 9px 0 3px 9px;font-size: 13px;">
-            <span v-if="index==0">置顶</span>
-            <span v-if="index==1">今天</span>
-            <span v-if="index==2">昨天</span>
-            <span v-if="index==3">更早</span>
-            <el-divider class="line" style="margin-top: 3px;"></el-divider>
-          </div>
 
-
-          <el-table
-              :ref="setRef(index)"
-              :data="item"
-              @rowClick="emailClick"
-              @row-contextmenu="row_rightClick($event)"
-              @contextmenu="rightClick($event)"
-              style="text-align: left"
-              :show-header="false"
-              @selectionChange="selectionChange(index,$event)"
-              :row-class-name="rowStyle"
-          >
-            <el-table-column type="selection" width="30"/>
-
-            <el-table-column width="50">
-              <template #default="{ row }">
-                <!--                          <span v-if="row.statusText == '未读'">-->
-                <!--                            <el-icon style="margin-top: 6px;"><Message/></el-icon>-->
-                <!--                          </span>-->
-              </template>
-            </el-table-column>
-
-            <el-table-column prop="nickname" label="发件人" width="150"/>
-            <el-table-column prop="subject" label="主题" width="150"/>
-            <el-table-column prop="plainText" label="内容" style="overflow: hidden;height: 200px" class="notEnter"/>
-            <el-table-column prop="createTime" width="360"/>
-
-          </el-table>
+    <template v-for="(item ,index) in data">
+      <div v-if="item.length!=0">
+        <div v-if="group=='收件箱'"  style="text-align: left;margin: 9px 0 3px 9px;font-size: 13px;">
+          <span v-if="index==0">置顶</span>
+          <span v-if="index==1">今天</span>
+          <span v-if="index==2">昨天</span>
+          <span v-if="index==3">更早</span>
+          <el-divider class="line" style="margin-top: 3px;"></el-divider>
         </div>
-      </template>
-
-    </div>
 
 
-    <div style="height: 100px;margin-top: 20px;">
+        <el-table
+            :ref="setRef(index)"
+            :data="item"
+            @rowClick="emailClick"
+            @row-contextmenu="row_rightClick($event)"
+            @contextmenu="rightClick($event)"
+            style="text-align: left"
+            :show-header="false"
+            @selectionChange="selectionChange(index,$event)"
+
+        >
+          <el-table-column type="selection" width="30"/>
+
+          <el-table-column width="50">
+            <template #default="{ row }">
+              <!--                          <span v-if="row.statusText == '未读'">-->
+              <!--                            <el-icon style="margin-top: 6px;"><Message/></el-icon>-->
+              <!--                          </span>-->
+            </template>
+          </el-table-column>
+
+          <el-table-column prop="nickname" label="发件人" width="150"/>
+          <el-table-column prop="subject" label="主题" width="150"/>
+          <el-table-column prop="plainText" label="内容" style="overflow: hidden;height: 200px" class="notEnter"/>
+          <el-table-column prop="createTime" width="360"/>
+
+        </el-table>
+      </div>
+    </template>
+
+
+    <div style="height: 100px;margin-top: 20px">
       <el-button-group>
         <el-button @click="pageChange(-1)" :disabled="currentPage==1" :icon="ArrowLeft">上一页</el-button>
         <el-button @click="pageChange(+1)" :disabled="currentPage==pages">
@@ -282,12 +224,9 @@ import router from "@/router";
 import {shallowRef} from "vue";
 import {menusEvent} from 'vue3-menus';
 import route from "@/router";
-
+import title from "@/components/Home/title.vue";
 //存放几个table的实例
 const refsMap = ref({} as any);
-
-import eventBus from '@/assets/util/eventBus'
-import _ from "lodash";
 
 /**
  * 设置table的实例
@@ -396,13 +335,6 @@ const data = ref([] as any)
 const checkList = ref([] as any[])
 
 let reportVisible = ref()
-let commonData = ref(
-    {
-      createEmailFolder: "",
-      groupList:[]
-    }
-)
-let createFolderAndMoveEmail = ref()
 const report = ref()
 const currentRightClick = ref()
 let group: any;
@@ -466,13 +398,13 @@ let currentTotal = ref(0)
 function getMessageList(flag = false, page = 1, size = 20) {
   axios.get("/api/email/getEmailByGroup?group=" + group + "&page=" + page + "&size=" + size).then(res => {
     if (res.data.flag === true) {
-      if (group == "收件箱") {
+      if(group=="收件箱") {
         data.value[0] = (res.data.data.data.pinnedEmailList)
         data.value[1] = (res.data.data.data.todayEmailList)
         data.value[2] = (res.data.data.data.yesterdayEmailLis)
         data.value[3] = (res.data.data.data.previousEmailList)
         currentTotal.value = res.data.data.currentTotal
-      } else {
+      }else{
         data.value[0] = (res.data.data.records)
         currentTotal.value = res.data.data.total
       }
@@ -503,7 +435,6 @@ onBeforeMount(() => {
   group = route.currentRoute.value.query.group
   data.value = [[], [], [], []]
   getMessageList()
-  getGroupList()
 })
 
 const emailClick = (e: any) => {
@@ -697,9 +628,9 @@ const menus = shallowRef({
 /**
  * 设置邮件置顶
  */
-function setEmailsPinned() {
-  if (ifNotSelect()) return
-  axios.post("/api/email/setEmailPinned?group=" + group, selectList).then(e => {
+function setEmailsPinned(){
+  if(ifNotSelect()) return
+  axios.post("/api/email/setEmailPinned?group="+group, selectList).then(e => {
     if (e.data.flag == true) {
       ElMessage.success("置顶成功")
       getMessageList();
@@ -708,10 +639,9 @@ function setEmailsPinned() {
     }
   })
 }
-
-function cancelSetEmailsPinned() {
-  if (ifNotSelect()) return
-  axios.post("/api/email/cancelSetEmailPinned?group=" + group, selectList).then(e => {
+function cancelSetEmailsPinned(){
+  if(ifNotSelect()) return
+  axios.post("/api/email/cancelSetEmailPinned?group="+group, selectList).then(e => {
     if (e.data.flag == true) {
       ElMessage.success("取消成功")
       getMessageList();
@@ -734,66 +664,6 @@ const options = [
   },
 
 ]
-
-/**
- * 标记邮件颜色
- * @param color
- */
-function markEmailColor(color: string) {
-  if (ifNotSelect()) return
-  axios.post("/api/email/markEmailColor?color=" + color, selectList).then(e => {
-    if (e.data.flag == true) {
-      if (color == "black")
-        ElMessage.success("取消成功")
-      else
-        ElMessage.success("标记成功")
-      getMessageList();
-    } else {
-      ElMessage.error(e.data.message)
-    }
-  })
-}
-
-/**
- * 判断当前的颜色
- * @param row
- * @param rowIndex
- */
-
-function rowStyle(row: any) {
-  let color = toRaw(row.row).color
-  if (typeof (color) == "undefined") {
-    return "black_class";
-  }
-  return color + "_class";
-}
-
-/**
- * 创建文件夹并移动
- */
-function createFolderAndMoveEmailSubmit() {
-  createFolderAndMoveEmail.value = false
-  if (commonData.value.createEmailFolder == "") {
-    ElMessage.warning("请输入要创建的文件夹哦")
-    return
-  }
-  axios.post("/api/email/createEmailFolder?group=" + commonData.value.createEmailFolder, selectList).then(e => {
-    if (e.data.flag == true) {
-      ElMessage.success("创建成功")
-      getMessageList();
-      eventBus.emit('updateGroup');
-    } else {
-      ElMessage.error(e.data.message)
-    }
-  })
-}
-
-function getGroupList() {
-  axios.get("/api/email/getGroupList").then(e => {
-    commonData.value.groupList=e.data.data
-  })
-}
-
 
 </script>
 <style>
@@ -827,47 +697,10 @@ function getGroupList() {
   font-size: 20px;
   width: 100%;
 }
-
 .line {
   width: 98%;
   height: 0.5px;
   background: #c2d3f4;
   margin: 0;
-}
-
-.black_class {
-  color: black;
-}
-
-.green_class {
-  color: green;
-}
-
-.orange_class {
-  color: orange;
-}
-
-.blue_class {
-  color: blue;
-}
-
-.pink_class {
-  color: pink;
-}
-
-.indigo_class {
-  color: indigo;
-}
-
-.yellow_class {
-  color: #b7b73e;
-}
-
-.purple_class {
-  color: purple;
-}
-
-.grey_class {
-  color: grey;
 }
 </style>

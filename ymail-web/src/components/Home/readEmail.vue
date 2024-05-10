@@ -1,9 +1,11 @@
 <script lang="ts" setup>
-import {defineComponent, onBeforeMount, onMounted} from 'vue'
+import {defineComponent, onBeforeMount, onMounted, ref} from 'vue'
 import {ArrowDown} from "@element-plus/icons-vue";
 import route from "@/router";
 import axios from "axios";
 import {reactive} from "@vue/reactivity";
+import 'deep-chat'
+let drawer = ref(false)
 
 let id;
 let data = reactive({
@@ -30,11 +32,19 @@ onBeforeMount(() => {
   axios.get("/api/email/readEmail?emailId=" + id).then(res => {
     data.email = res.data.data
   })
+
 });
+
 
 </script>
 
 <template>
+
+  <el-drawer v-model="drawer" title="I am the title" :with-header="false" :size="370">
+    <Chat></Chat>
+
+  </el-drawer>
+
 
 
 
@@ -85,6 +95,7 @@ onBeforeMount(() => {
               </el-dropdown>
 
               <el-button text style=" border: 1px solid #b7bcc7; font-size: 13px;width: 60px;margin-left: 13px">刷新</el-button>
+              <el-button text style=" border: 1px solid #b7bcc7; font-size: 13px;width: 60px;margin-left: 13px"  @click="drawer = true">ai问答</el-button>
 
             </div>
         <br>

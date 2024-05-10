@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public Result<Void> handleException(Exception e, HttpServletResponse response) {
+        e.printStackTrace();
         log.error("全局异常信息：{}", e.getMessage(), e);
         return Result.failure(e.getMessage());
     }

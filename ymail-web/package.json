@@ -8,10 +8,12 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
+    "@iconify/vue": "^4.1.2",
     "@vue/reactivity": "^3.4.15",
     "@wangeditor/editor": "^5.1.23",
     "@wangeditor/editor-for-vue": "^5.1.12",
     "axios": "^1.6.7",
+    "deep-chat": "^1.4.11",
     "element-plus": "^2.6.0",
     "js-cookie": "^3.0.5",
     "mitt": "^3.0.1",
@@ -27,6 +29,8 @@
     "@vue/cli-plugin-typescript": "~5.0.0",
     "@vue/cli-plugin-vuex": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
+    "sass-loader": "^14.2.1",
+    "scss-loader": "^0.0.1",
     "typescript": "~4.5.5"
   },
   "browserslist": [

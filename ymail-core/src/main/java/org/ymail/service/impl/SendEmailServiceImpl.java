@@ -1,5 +1,6 @@
 package org.ymail.service.impl;
 
+import com.alibaba.fastjson2.JSON;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.ymail.entity.Attachment;
@@ -42,7 +43,7 @@ public class SendEmailServiceImpl implements SendEmailService {
         email.setMaster(email.getFrom());
 
         //发送到mq并写入数据库
-//        mqProducer.sendMsg(JSON.toJSONString(email));
+        mqProducer.sendMsg(JSON.toJSONString(email));
         //TODO:处理与附件的关系
         //目前由于email中没有附件字段，因此还可以继续运行
         if(email.getAttachments()!=null&&!email.getAttachments().isEmpty()){
