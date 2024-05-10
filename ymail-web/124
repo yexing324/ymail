@@ -1,0 +1,33 @@
+<template>
+
+  <deep-chat
+      :demo="true"
+      :textInput="{ placeholder: { text: 'Welcome to the demo!' } }"
+      :initialMessages="initialMessages"
+  />
+</template>
+
+<script>
+import 'deep-chat';
+
+export default {
+  name: 'App',
+  data() {
+    return {
+      initialMessages: [
+        { role: 'user', text: 'Hey, how are you today?' },
+        { role: 'ai', text: 'I am doing very well!' },
+      ],
+    };
+  },
+};
+</script>
+
+<style>
+div {
+  font-family: sans-serif;
+  text-align: center;
+  justify-content: center;
+  display: grid;
+}
+</style>

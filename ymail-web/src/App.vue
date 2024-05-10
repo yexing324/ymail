@@ -1,32 +1,37 @@
 <template>
-    <!--  <nav>-->
-    <!--  </nav>-->
-    <router-view />
-  </template>
-<style lang="scss" scoped>
-.a{
+  <div class="main">
+    <router-view v-slot="{ Component, route }">
+      <component :is="layout">
+        <component :is="Component" :key="route.path" />
+      </component>
+    </router-view>
+  </div>
+</template>
 
-}
-</style>
-<!--  <style>-->
-<!--  #app {-->
-<!--    font-family: Avenir, Helvetica, Arial, sans-serif;-->
-<!--    -webkit-font-smoothing: antialiased;-->
-<!--    -moz-osx-font-smoothing: grayscale;-->
-<!--    text-align: center;-->
-<!--    color: #2c3e50;-->
-<!--  }-->
+<script>
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 
-<!--  nav {-->
-<!--    padding: 30px;-->
-<!--  }-->
+export default {
+  name: 'App',
+  setup() {
+    const route = useRoute();
+    const layout = computed( () => {
+      const layout = route.meta.layout || 'default';
 
-<!--  nav a {-->
-<!--    font-weight: bold;-->
-<!--    color: #2c3e50;-->
-<!--  }-->
+      if ( layout === 'blank' ) {
+        return 'LayoutBlank';
+      }
+      else if ( layout === 'default' ) {
+        return 'LayoutDefault';
+      }
 
-<!--  nav a.router-link-exact-active {-->
-<!--    color: #42b983;-->
-<!--  }-->
-<!--  </style>-->
+      return 'LayoutBlank';
+    } );
+
+    return {
+      layout
+    };
+  }
+};
+</script>

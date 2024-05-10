@@ -34,13 +34,14 @@ onBeforeMount(() => {
   })
 
 });
+import Chat from "@/components/chat/Chat.vue";
 
 
 </script>
 
 <template>
 
-  <el-drawer v-model="drawer" title="I am the title" :with-header="false" :size="370">
+  <el-drawer v-model="drawer" title="I am the title" :with-header="false" :size="540">
     <Chat></Chat>
 
   </el-drawer>
