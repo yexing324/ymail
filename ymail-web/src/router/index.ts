@@ -12,6 +12,9 @@ import Temp from "@/components/Home/temp.vue";
 import Setting from "@/views/setting.vue";
 import UserInfo from "@/components/setting/UserInfo.vue";
 import GroupManage from "@/components/setting/GroupManage.vue";
+import EchartsTable from "@/components/setting/EChartsTable.vue";
+import EChartsTable from "@/components/setting/EChartsTable.vue";
+import ManageEChatsTable from "@/components/setting/ManageEChatsTable.vue";
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -40,6 +43,14 @@ const routes: Array<RouteRecordRaw> = [
             {
                 path: '/groupManage',
                 component: GroupManage
+            },
+            {
+                path: '/dataAnalyse',
+                component: EChartsTable
+            },
+            {
+                path: '/adminDataAnalyse',
+                component: ManageEChatsTable
             }
         ]
     },

@@ -22,7 +22,9 @@
                       maxlength="10"
                       style="height: 50px"
 
-                      show-word-limit />
+                      show-word-limit >
+              <template #append>{{domain}}</template>
+            </el-input>
             <el-input v-model="ruleForm2.password"
                       style="margin-top: 20px;height: 50px"
                       placeholder="请输入密码"
@@ -119,6 +121,7 @@ export default {
               this.$router.push('/home');
               Cookies.set('cookie', data.data.cookie, {expires: 7});
               Cookies.set('mail', data.data.mail, {expires: 7});
+              Cookies.set('avatarName', data.data.avatarName, {expires: 7});
             }
             this.logining = false;
           })

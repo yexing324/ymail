@@ -80,6 +80,9 @@ import {Plus} from '@element-plus/icons-vue'
 import {ElMessage} from "element-plus";
 import axios from "axios";
 import {onBeforeMount, ref} from "vue";
+import Cookies from "js-cookie";
+import setting from "@/views/setting.vue";
+import eventBus from "@/assets/util/eventBus";
 
 let data = ref(
     {
@@ -137,6 +140,8 @@ function changePassword() {
 
 function handleAvatarUpload(res, file) {
   data.value.avatarUrl = res.url;
+  Cookies.set('avatarName', res.url, {expires: 7})
+  eventBus.emit("updateImg")
 }
 
 function changeMobile() {

@@ -1,9 +1,10 @@
-<script lang="ts" setup>
+<script  setup>
 import {defineComponent} from 'vue'
 import axios from "axios";
 import {ElMessage} from "element-plus";
 import router from "@/router";
 import Cookies from "js-cookie";
+let avatarName = Cookies.get("avatarName");
 
 
 function logout(){
@@ -13,9 +14,10 @@ function logout(){
   Cookies.set('cookie', "", {expires: 7});
   Cookies.set('mail', "", {expires: 7});
 }
+
 const setting = () => {
   router.push({
-    path: '/setting',
+    path: '/userInfo',
   })
 }
 </script>
@@ -30,7 +32,7 @@ const setting = () => {
 -->
     <el-dropdown trigger="click" style="margin-left: 80%"  >
       <span class="el-dropdown-link">
-        <img src="../../assets/logo.png" alt="" style="width: 40px;height: 40px;border-radius: 50%;margin-left: 20px">
+        <img :src="avatarName" alt="" style="width: 40px;height: 40px;border-radius: 50%;margin-left: 20px">
       </span>
       <template #dropdown>
         <el-dropdown-menu>

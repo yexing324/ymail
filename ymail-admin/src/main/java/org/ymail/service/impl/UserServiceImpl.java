@@ -111,14 +111,27 @@ public class UserServiceImpl implements UserService {
         Boolean flag = stringRedisTemplate.hasKey("login_account:" + userDo.getMail());
         if (Boolean.TRUE.equals(flag)) {//redis中已经包含该用户
             Set<Object> keys = stringRedisTemplate.opsForHash().keys("login_account:" + userDo.getMail());
-            UserResp userResp = UserResp.builder().mail(userDo.getMail()).cookie(keys.iterator().next().toString()).build();
+            String cookie = keys.iterator().next().toString();
+            UserDo userDo1 = JSON.parseObject(stringRedisTemplate.opsForHash().get("login_account:" + userDo.getMail(), cookie).toString(), UserDo.class);
+            UserResp userResp = UserResp.builder()
+                    .mail(userDo.getMail())
+                    .cookie(cookie)
+                    .avatarName(CodeContain.uploadAddress+userDo1.getAvatarName())
+                    .build();
+            if (userResp.getAvatarName()==null){
+                userResp.setAvatarName(CodeContain.uploadAddress+"default.png");
+            }
             return Result.success(userResp);
+        }
+        if (userDo.getAvatarName()==null){
+            userDo.setAvatarName("default.png");
         }
         //不包含
         String token = UUID.randomUUID().toString();
         stringRedisTemplate.opsForHash().put("login_account:" + userDo.getMail(), token, JSON.toJSONString(userDo));
         stringRedisTemplate.expire("login_account:" + userDo.getMail(), 30L, TimeUnit.DAYS);
-        UserResp userResp = UserResp.builder().mail(userDo.getMail()).cookie(token).build();
+        UserResp userResp = UserResp.builder().mail(userDo.getMail()).cookie(token)
+                .avatarName(CodeContain.uploadAddress+userDo.getAvatarName()).build();
         return Result.success(userResp);
     }
 

@@ -2,8 +2,19 @@
   <div style="display: flex;flex-direction:column;height: 100vh;background: white">
     <div style="width: 100%;">
       <div style="padding: 20px 0 0 20px">
-        <span class="ymail">YMail</span>
+        <span class="ymail" @click="returnHome">YMail</span>
         <span class="freeMail">免费邮箱</span>
+
+        <el-dropdown trigger="click" style="margin-left: 80%">
+      <span class="el-dropdown-link">
+        <img :src="avatarName" alt="" style="width: 40px;height: 40px;border-radius: 50%;margin-left: 20px">
+      </span>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item @click="logout">退出账户</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
 
       </div>
       <el-divider class="line"></el-divider>
@@ -11,12 +22,12 @@
     <!--     最上面设置结束-->
     <div style="display: flex;overflow:hidden;">
       <div style="flex-shrink:0">
-       <setting-menu></setting-menu>
+        <setting-menu></setting-menu>
 
       </div>
 
       <div style="width: 100%;overflow:hidden;padding: 10px 0 0 10px">
-        <router-view />
+        <router-view/>
       </div>
 
       <!--      &lt;!&ndash;内部将变成上下布局&ndash;&gt;-->
@@ -33,13 +44,17 @@
 
 <script setup>
 import router from "@/router";
-import {onBeforeMount, toRaw} from "vue";
+import {onBeforeMount, ref, toRaw} from "vue";
 import store from "../store/index";
 import axios from "axios";
 import Cookies from "js-cookie";
 import {ElMessage} from "element-plus";
 import LeftMenu from "@/components/Home/leftMenu.vue";
 import SettingMenu from "@/components/setting/settingMenu.vue";
+import eventBus from "@/assets/util/eventBus";
+
+let avatarName = ref('')
+
 let menu1 = [
   {
     label: '收件箱',
@@ -63,9 +78,16 @@ const test = () => {
   console.log("123")
 }
 
+function returnHome() {
+  router.push({
+    path: '/home',
+  })
+}
+
 
 let data;
 onBeforeMount(() => {
+  avatarName.value=Cookies.get("avatarName");
   //初始化菜单
   data = toRaw(store.getters.getData)
   //初始化数据
@@ -76,6 +98,10 @@ onBeforeMount(() => {
       path: '/login',
     })
   }
+
+  eventBus.on("updateImg",()=>{
+    avatarName.value=Cookies.get("avatarName")
+  })
 
 
 })
@@ -101,6 +127,13 @@ const defaultProps = {
   children: 'children',
   label: 'label',
 }
+function logout(){
+  router.push({
+    path: '/login',
+  })
+  Cookies.set('cookie', "", {expires: 7});
+  Cookies.set('mail', "", {expires: 7});
+}
 </script>
 
 
@@ -117,6 +150,7 @@ const defaultProps = {
 .el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content {
   background-color: #ebf2ff;
 }
+
 .ymail {
   font-size: 50px;
   color: red;

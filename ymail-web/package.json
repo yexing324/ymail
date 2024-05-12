@@ -14,6 +14,7 @@
     "@wangeditor/editor-for-vue": "^5.1.12",
     "axios": "^1.6.7",
     "deep-chat": "^1.4.11",
+    "echarts": "^5.5.0",
     "element-plus": "^2.6.0",
     "js-cookie": "^3.0.5",
     "mitt": "^3.0.1",

@@ -15,4 +15,5 @@ import lombok.NoArgsConstructor;
 public class UserResp {
     private String mail;
     private String cookie;
+    private String avatarName;
 }

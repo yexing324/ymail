@@ -6,6 +6,7 @@ import {EditPen, MessageBox} from "@element-plus/icons-vue";
 import axios from "axios";
 import _ from 'lodash'
 import eventBus from "@/assets/util/eventBus"
+import Cookies from "js-cookie";
 
 const data = ref({
   menu1: [
@@ -17,18 +18,17 @@ const data = ref({
     },
     {
       label: '数据统计',
-    }
+    },
+    {
+      label: '管理员数据分析',
+    },
   ]
 })
 
-onBeforeMount(() => {
 
 
-})
-
-const handleNodeClick = (e: { label: any; }) => {
+const handleNodeClick = (e:{ label: any}) => {
   let label = e.label
-  console.log(label)
   switch (label) {
     case "个人信息":
       router.push({
@@ -42,7 +42,12 @@ const handleNodeClick = (e: { label: any; }) => {
       break;
     case "数据统计":
       router.push({
-        path: '/dataStatistics',
+        path: '/dataAnalyse',
+      })
+      break;
+    case "管理员数据分析":
+      router.push({
+        path: '/adminDataAnalyse',
       })
       break;
   }
