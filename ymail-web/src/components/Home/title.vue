@@ -1,17 +1,38 @@
-<script lang="ts">
+<script lang="ts" setup>
 import {defineComponent} from 'vue'
+import axios from "axios";
+import {ElMessage} from "element-plus";
+import router from "@/router";
+import Cookies from "js-cookie";
 
-export default defineComponent({
-  name: "title",
-  methods:{
-  }
-})
+
+function logout(){
+  router.push({
+    path: '/login',
+  })
+  Cookies.set('cookie', "", {expires: 7});
+  Cookies.set('mail', "", {expires: 7});
+}
 </script>
 
 <template>
   <div style="display: flex;margin: 10px 0 10px 10px">
     <span class="ymail">YMail</span>
     <span class="freeMail">免费邮箱</span>
+<!--    用户头像，点击可以选择退出账户
+右浮动
+
+-->
+    <el-dropdown trigger="click" style="margin-left: 80%"  >
+      <span class="el-dropdown-link">
+        <img src="../../assets/logo.png" alt="" style="width: 40px;height: 40px;border-radius: 50%;margin-left: 20px">
+      </span>
+      <template #dropdown>
+        <el-dropdown-menu>
+          <el-dropdown-item @click="logout">退出账户</el-dropdown-item>
+        </el-dropdown-menu>
+      </template>
+      </el-dropdown  >
 
 
   </div>

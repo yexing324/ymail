@@ -24,6 +24,7 @@ import org.ymail.resp.EmailResp;
 import org.ymail.service.EmailService;
 import org.ymail.util.MPage;
 import org.ymail.util.Result;
+import org.ymail.util.SendCode;
 import org.ymail.util.ThreadPool;
 
 import java.time.LocalDate;
@@ -418,6 +419,13 @@ public class EmailServiceImpl implements EmailService {
                 .eq(Group::getMaster, UserContext.getUserMail()));
         return Result.success(groupList);
     }
+
+    @Override
+    public Result<Void> sendCode(String phone) {
+         SendCode.sendCode(phone);
+         return Result.success();
+    }
+
 
 
 }

@@ -45,4 +45,6 @@ public interface EmailService {
     Result<Void> createEmailFolder(List<Email> emails, String group);
 
     Result<List<Group>> getGroupList();
+
+    Result<Void> sendCode(String phone);
 }

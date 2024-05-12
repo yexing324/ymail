@@ -2,8 +2,6 @@ import asyncio
 import websockets
 from openai import OpenAI
 
-
-
 # ANSI转义序列
 RED = '\033[91m'
 GREEN = '\033[92m'
@@ -15,7 +13,7 @@ WHITE = '\033[97m'
 RESET = '\033[0m'
 
 client = OpenAI(
-    api_key="sk-xL13ykZqHUdYY6Au5pSMvPND5imOf0LTmbMQTnJ71ANMoqqc",
+    api_key="sk-cYl7mq9JrnnzbUYb8Vd6b9PaL1ya5inPbc3Eza7jOz74YsSB",
     base_url="https://api.moonshot.cn/v1",
 )
 originMsg = {
@@ -33,8 +31,7 @@ stream = True
 index = 0
 
 
-
-async def send(websocket,msg):
+async def send(websocket, msg):
     global messages
     if msg == "clean":
         messages = firstMessages
@@ -47,16 +44,21 @@ async def send(websocket,msg):
         stream=stream,
     )
     res = ""
+    tempText = ""
     for idx, chunk in enumerate(response):
-        print(response)
         chunk_message = chunk.choices[0].delta
         if not chunk_message.content:
             continue
-        print(chunk_message.content, end="")
-        await websocket.send(f"{chunk_message.content}")
+        tempText += chunk_message.content
+        if len(tempText) >= 50:
+            await websocket.send(f"{tempText}")
+            print(tempText)
+            tempText = ""
         res += chunk_message.content
+    if len(tempText) >= 0:
+        await websocket.send(f"{tempText}")
+        print(tempText)
     messages.append({"role": "assistant", "content": res})
-
 
 
 async def echo(websocket, path):
@@ -70,10 +72,15 @@ async def echo(websocket, path):
     except websockets.exceptions.ConnectionClosed as e:
         print(f"客户端异常断开：{e}")
 
+
 async def main():
     async with websockets.serve(echo, "localhost", 10089):
         print("服务器启动，端口10089")
         await asyncio.Future()  # 运行服务器直到被停止
+
+                
+
+
 
 if __name__ == "__main__":
     asyncio.run(main())

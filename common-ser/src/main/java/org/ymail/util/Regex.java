@@ -15,4 +15,8 @@ public class Regex {
         Matcher matcher = pattern.matcher(str);
         return matcher.matches();
     }
+
+    public static boolean isEmail(String mail) {
+        return validate(mail,"^[A-Za-z0-9]+([-._][A-Za-z0-9]+)*@[A-Za-z0-9]+(-[A-Za-z0-9]+)*(.[A-Za-z]{2,6}|[A-Za-z]{2,4}.[A-Za-z]{2,3})$");
+    }
 }

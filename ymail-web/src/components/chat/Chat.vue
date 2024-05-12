@@ -26,37 +26,68 @@ import {ref, reactive, nextTick, onBeforeMount} from 'vue';
 import ChatConversation from '@/components/chat/ChatConversation.vue';
 import ChatHeader from '@/components/chat/ChatHeader.vue';
 import ChatBox from '@/components/chat/ChatBox.vue';
+import Title from "@/components/Home/title.vue";
+
 
 export default {
   name: 'ChatBase',
   components: {
+    Title,
     ChatHeader,
     ChatBox,
     ChatConversation
   },
 
   setup() {
-    let socket;let index=0;let lastIndex=0;
+    let socket;
+    let index = 0;
+    let lastIndex = 0;
+    let buffer1 = ref("你好")
     onBeforeMount(() => {
       socket = new WebSocket('ws://localhost:10089');
       socket.onopen = () => {
         console.log('WebSocket连接成功');
       };
       let current;
+      let buffer;
 
       socket.onmessage = (event) => {
 
         const messageContent = event.data.replace(/message:/, "").trim();
-        if(lastIndex===index-1){
+        isLoading.value=false
+
+
+        if (lastIndex === index - 1) {
           messages.push({
             text: messageContent,
             author: 'assistant'
           });
-          current=messages[messages.length-1]
+          current = messages[messages.length - 1]
           lastIndex++;
-        }else{
-          current.text=messageContent
+        } else {
+          current.text += messageContent
+          scrollToBottomMessages()
         }
+        // }
+
+        // if(!updateTimer){
+        //   updateTimer=setTimeout(()=>{
+        //     if(lastIndex===index-1){
+        //       messages.push({
+        //         text: messageContent,
+        //         author: 'assistant'
+        //       });
+        //       current=messages[messages.length-1]
+        //       lastIndex++;
+        //     }else{
+        //       current.text+=buffer
+        //       scrollToBottomMessages();
+        //     }
+        //     buffer=""
+        //     clearTimeout(updateTimer)
+        //     updateTimer=null;
+        //   },200)
+        // }
 
 
         scrollToBottomMessages();
@@ -103,11 +134,11 @@ export default {
     }
 
 
-
-
     const sendMessage = async (textValue) => {
+      isLoading.value = true;
+
       index++;
-      lastIndex=index-1;
+      lastIndex = index - 1;
       messages.push({
         text: textValue,
         author: 'user'
@@ -136,22 +167,15 @@ export default {
       //   } ),
       // };
       //
-      try {
-        isLoading.value = true;
-        //
-        // const response = await fetch(
-        //   'https://api.openai.com/v1/completions',
-        //   options
-        // );
-        // const data = await response.json();
-        scrollToBottomMessages();
 
-        isLoading.value = false;
-      } catch ( error ) {
-        console.error( error );
+      //
+      // const response = await fetch(
+      //   'https://api.openai.com/v1/completions',
+      //   options
+      // );
+      // const data = await response.json();
+      scrollToBottomMessages();
 
-        isLoading.value = false;
-      }
     };
 
     return {

@@ -29,7 +29,9 @@ public class UserTransmitFilter implements Filter {
     private static final List<String> IGNORE_URI = List.of(
             "/ymail/admin/login",
             "/ymail/admin/register",
-            "/ymail/upload/getImg"
+            "/ymail/upload/getImg",
+            "/ymail/upload/uploadImg",
+            "/ymail/admin/sendCode"
     );
 
     @Override

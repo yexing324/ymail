@@ -6,7 +6,7 @@
 
 
     </div>
-<!--     最上面设置结束-->
+    <!--     最上面设置结束-->
     <div style="display: flex;overflow:hidden;">
       <div style="flex-shrink:0">
         <left-menu></left-menu>
@@ -16,10 +16,10 @@
         <router-view :key="this.$route.fullPath"></router-view>
       </div>
 
-<!--      &lt;!&ndash;内部将变成上下布局&ndash;&gt;-->
-<!--      <div style="display: inline-block;>-->
-<!--        <router-view></router-view>-->
-<!--      </div>-->
+      <!--      &lt;!&ndash;内部将变成上下布局&ndash;&gt;-->
+      <!--      <div style="display: inline-block;>-->
+      <!--        <router-view></router-view>-->
+      <!--      </div>-->
 
     </div>
 
@@ -34,7 +34,9 @@ import {onBeforeMount, toRaw} from "vue";
 import store from "../store/index";
 import Title from "@/components/Home/title.vue";
 import LeftMenu from "@/components/Home/leftMenu.vue";
-
+import axios from "axios";
+import Cookies from "js-cookie";
+import {ElMessage} from "element-plus";
 
 
 const test = () => {
@@ -48,6 +50,14 @@ onBeforeMount(() => {
   //初始化菜单
   data = toRaw(store.getters.getData)
   //初始化数据
+  let cookie = Cookies.get("cookie")
+  if (cookie === "") {
+    ElMessage.warning("请先登录")
+    router.push({
+      path: '/login',
+    })
+  }
+
 
 })
 
@@ -95,9 +105,6 @@ div {
 }
 
 </style>
-
-
-
 
 
 <!--<template>-->

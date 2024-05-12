@@ -482,6 +482,10 @@ function getMessageList(flag = false, page = 1, size = 20) {
       if (flag) {
         ElMessage.success("刷新成功")
       }
+    }else{
+      router.push({
+        path: '/login',
+      })
     }
   })
 }

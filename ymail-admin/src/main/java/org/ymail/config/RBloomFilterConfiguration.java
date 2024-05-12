@@ -15,9 +15,9 @@ public class RBloomFilterConfiguration {
      * 防止注册时查询数据库的布隆过滤器
      */
     @Bean
-    public RBloomFilter<String> userRegisterCachePenetrationBloomFilter(RedissonClient redissonClient) {
+    public RBloomFilter<String> registerBloomFilter(RedissonClient redissonClient) {
         RBloomFilter<String> cachePenetrationBloomFilter = redissonClient.getBloomFilter("register");
-        cachePenetrationBloomFilter.tryInit(10000, 0.050);
+        cachePenetrationBloomFilter.tryInit(100000, 0.050);
         return cachePenetrationBloomFilter;
     }
 }

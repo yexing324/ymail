@@ -31,10 +31,7 @@ public class UserDo extends BaseDO {
      */
     @NotBlank(message = "手机号不能为空",groups = Register.class)
     private String phone;
-    /**
-     * vip
-     */
-    private String vipFlag;
+
 
     /* 分组校验 */
     public @interface Register {}
