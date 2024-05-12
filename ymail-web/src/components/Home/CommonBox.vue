@@ -189,7 +189,7 @@
       </el-button-group>
       &nbsp;
 
-      <el-button @click="btn" style="border-radius: 60px;border: 1px solid grey;width: 20px;margin-right: 5px;">
+      <el-button @click="setting" style="border-radius: 60px;border: 1px solid grey;width: 20px;margin-right: 5px;">
         <el-icon size="20px">
           <Setting/>
         </el-icon>
@@ -310,8 +310,10 @@ function setRef(index: any) {
   };
 }
 
-function btn() {
-  console.log(selectOriginList)
+function setting() {
+  router.push({
+    path: '/userInfo',
+  })
 }
 
 /**

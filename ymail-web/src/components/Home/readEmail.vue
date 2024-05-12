@@ -34,6 +34,9 @@ onBeforeMount(() => {
   })
 
 });
+function showClick(p:any){
+
+}
 import Chat from "@/components/chat/Chat.vue";
 
 
@@ -103,7 +106,7 @@ import Chat from "@/components/chat/Chat.vue";
         <br>
 
 
-        <div style="background: #eff5fb;">
+        <div style="background: #eff5fb;padding: 10px;width: 98%">
           <div style="text-align:left;margin-bottom: 10px;">
             <span></span><strong>{{ data.email.subject }}</strong>
           </div>

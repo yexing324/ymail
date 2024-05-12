@@ -86,7 +86,7 @@ import eventBus from "@/assets/util/eventBus";
 
 let data = ref(
     {
-      avatarUrl: 'https://nos.netease.com/mail-online/b18734c8037dc640278097c83cfa427b/mail180x180.jpg?imageView&thumbnail=100x100&timestamp=1715505332095',
+      avatarUrl: '',
       email: '',
       nickname: '',
       mobileNumber: '',

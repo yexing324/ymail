@@ -20,11 +20,16 @@ const setting = () => {
     path: '/userInfo',
   })
 }
+function homeIng(){
+  router.push({
+    path: '/home',
+  })
+}
 </script>
 
 <template>
   <div style="display: flex;margin: 10px 0 10px 10px">
-    <span class="ymail">YMail</span>
+    <span class="ymail" @click="homeIng">YMail</span>
     <span class="freeMail">免费邮箱</span>
 <!--    用户头像，点击可以选择退出账户
 右浮动

@@ -6,6 +6,7 @@ import {EditPen, MessageBox} from "@element-plus/icons-vue";
 import axios from "axios";
 import _ from 'lodash'
 import eventBus from "@/assets/util/eventBus"
+import {ElMessage} from "element-plus";
 
 const data = ref({
   menu1: [],
@@ -28,7 +29,7 @@ onBeforeMount(() => {
 
 
 })
-
+const fullscreenLoading = ref(false)
 
 function getGroupList() {
   axios.get("/api/email/getGroupList").then(e => {
@@ -41,6 +42,13 @@ function getGroupList() {
   })
 }
 
+const receiveMessage=()=>{
+  fullscreenLoading.value = true
+  setTimeout(() => {
+    fullscreenLoading.value = false
+    ElMessage.success("收取成功")
+  }, 300)
+}
 const write = () => {
   router.push('/write')
 }
@@ -122,7 +130,10 @@ const defaultProps = {
 
 <template>
   <div style="height: 100vh;border-right: #c2d3f4 1px solid;text-align: left">
-    <el-button type="primary" class="topItem">
+    <el-button
+        v-loading.fullscreen.lock="fullscreenLoading"
+        @click="receiveMessage"
+        type="primary" class="topItem">
       <el-icon>
         <MessageBox/>
       </el-icon>
