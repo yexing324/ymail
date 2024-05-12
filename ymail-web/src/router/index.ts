@@ -9,6 +9,9 @@ import ReadEmail from "@/components/Home/readEmail.vue";
 import SendBox from "@/components/Home/SendBox.vue";
 import CommonBox from "@/components/Home/CommonBox.vue";
 import Temp from "@/components/Home/temp.vue";
+import Setting from "@/views/setting.vue";
+import UserInfo from "@/components/setting/UserInfo.vue";
+import GroupManage from "@/components/setting/GroupManage.vue";
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -24,6 +27,21 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/write',
         component: WriteMessage
+    },
+    {
+        path: '/setting',
+        name:"setting",
+        component: Setting,
+        children: [
+            {
+                path: '/userInfo',
+                component: UserInfo
+            },
+            {
+                path: '/groupManage',
+                component: GroupManage
+            }
+        ]
     },
     {
         path: '/home',

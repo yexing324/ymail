@@ -12,14 +12,17 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.ymail.entity.UserDo;
 import org.ymail.entity.Vo.UserVo;
+import org.ymail.filter.UserContext;
 import org.ymail.mapper.UserMapper;
 import org.ymail.resp.UserResp;
 import org.ymail.service.UserService;
 import org.ymail.util.CodeContain;
 import org.ymail.util.Regex;
 import org.ymail.util.Result;
+import org.ymail.util.ThreadPool;
 
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -66,13 +69,13 @@ public class UserServiceImpl implements UserService {
         try {
             if (lock.tryLock()) {
 
-            UserDo userDo = BeanUtil.copyProperties(reqParam, UserDo.class);
+                UserDo userDo = BeanUtil.copyProperties(reqParam, UserDo.class);
 
-            int insert = userMapper.insert(userDo);
-            if (insert > 0) {
-                //将邮箱地址添加到布隆过滤器里面
-                registerBloomFilter.add(reqParam.getMail());
-                return Result.success();
+                int insert = userMapper.insert(userDo);
+                if (insert > 0) {
+                    //将邮箱地址添加到布隆过滤器里面
+                    registerBloomFilter.add(reqParam.getMail());
+                    return Result.success();
                 }
             }
 
@@ -117,6 +120,35 @@ public class UserServiceImpl implements UserService {
         stringRedisTemplate.expire("login_account:" + userDo.getMail(), 30L, TimeUnit.DAYS);
         UserResp userResp = UserResp.builder().mail(userDo.getMail()).cookie(token).build();
         return Result.success(userResp);
+    }
+
+    /**
+     * 获得用户登录时的具体信息
+     *
+     * @return 信息
+     */
+    @Override
+    public Result<UserDo> getUserInfo() {
+        Random random = new Random();
+        String userMail = UserContext.getUserMail();
+        //从数据库查
+        UserDo userDo = userMapper.selectOne(new LambdaQueryWrapper<UserDo>().eq(UserDo::getMail, userMail));
+        boolean flag = false;
+        if (userDo.getNickname() == null) {
+            flag = true;
+            userDo.setNickname(CodeContain.nickNameList.get(random.nextInt(10)));
+        }
+        if (userDo.getAvatarName() == null) {
+            flag = true;
+            userDo.setAvatarName("default.png");
+        }
+        if (flag) {
+            userMapper.updateById(userDo);
+        }
+        userDo.setAvatarName(CodeContain.uploadAddress+userDo.getAvatarName());
+        return Result.success(userDo);
+
+
     }
 
 

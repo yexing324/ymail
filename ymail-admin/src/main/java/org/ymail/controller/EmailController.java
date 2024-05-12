@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.ymail.entity.Email;
 import org.ymail.entity.Group;
+import org.ymail.entity.Vo.GroupVo;
 import org.ymail.enums.EmailGroup;
 import org.ymail.resp.EmailBo;
 import org.ymail.service.EmailService;
@@ -88,5 +89,20 @@ public class EmailController {
     @GetMapping("/getGroupList")
     public Result<List<Group>> getGroupList(){
         return emailService.getGroupList();
+    }
+    @GetMapping("/getGroupInfo")
+    public Result<List<GroupVo>>  getGroupInfo(){
+        return emailService.getGroupInfo();
+    }
+    //修改分组名称
+    @GetMapping("/changeGroupName")
+    public Result<Void> changeGroupName(String oldGroupName,String newGroupName){
+        return emailService.changeGroupName(oldGroupName,newGroupName);
+    }
+    //删除分组
+    @GetMapping("/deleteGroup")
+
+    public Result<Void> deleteGroup(String groupName){
+        return emailService.deleteGroup(groupName);
     }
 }

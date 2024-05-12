@@ -9,6 +9,7 @@ public interface UserService {
     Result<Void> register(UserVo reqParam);
 
     Result<UserResp> login(UserDo reParam);
+    Result<UserDo> getUserInfo();
 
 
 }

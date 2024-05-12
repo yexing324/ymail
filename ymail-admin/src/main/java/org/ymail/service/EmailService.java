@@ -2,13 +2,14 @@ package org.ymail.service;
 
 import org.ymail.entity.Email;
 import org.ymail.entity.Group;
+import org.ymail.entity.Vo.GroupVo;
 import org.ymail.resp.EmailBo;
 import org.ymail.util.Result;
 
 import java.util.List;
 
 public interface EmailService {
-    Result<Void> getLoginInfo();
+
 
     /**
      * 收信接口
@@ -47,4 +48,12 @@ public interface EmailService {
     Result<List<Group>> getGroupList();
 
     Result<Void> sendCode(String phone);
+
+    Result<Void> changePassWord(String oldP, String newP);
+
+    Result<List<GroupVo>>  getGroupInfo();
+
+    Result<Void> changeGroupName(String oldGroupName, String newGroupName);
+
+    Result<Void> deleteGroup(String groupName);
 }

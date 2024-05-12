@@ -13,6 +13,11 @@ function logout(){
   Cookies.set('cookie', "", {expires: 7});
   Cookies.set('mail', "", {expires: 7});
 }
+const setting = () => {
+  router.push({
+    path: '/setting',
+  })
+}
 </script>
 
 <template>
@@ -28,6 +33,9 @@ function logout(){
         <img src="../../assets/logo.png" alt="" style="width: 40px;height: 40px;border-radius: 50%;margin-left: 20px">
       </span>
       <template #dropdown>
+        <el-dropdown-menu>
+          <el-dropdown-item @click="setting">设置界面</el-dropdown-item>
+        </el-dropdown-menu>
         <el-dropdown-menu>
           <el-dropdown-item @click="logout">退出账户</el-dropdown-item>
         </el-dropdown-menu>

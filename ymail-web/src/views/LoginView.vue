@@ -22,9 +22,7 @@
                       maxlength="10"
                       style="height: 50px"
 
-                      show-word-limit >
-              <template #append>{{domain}}</template>
-            </el-input>
+                      show-word-limit />
             <el-input v-model="ruleForm2.password"
                       style="margin-top: 20px;height: 50px"
                       placeholder="请输入密码"
@@ -135,9 +133,7 @@ export default {
 
 
 <style scoped>
-#app {
-  background: #e4edfc;
-}
+
 
 .login-container {
   display: flex;

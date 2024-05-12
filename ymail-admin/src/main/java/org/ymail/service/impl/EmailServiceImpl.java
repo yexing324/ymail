@@ -3,35 +3,27 @@ package org.ymail.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.apache.ibatis.ognl.IntHashMap;
 import org.springframework.stereotype.Service;
-import org.ymail.entity.Attachment;
-import org.ymail.entity.Email;
-import org.ymail.entity.EmailReport;
-import org.ymail.entity.Group;
+import org.ymail.entity.*;
+import org.ymail.entity.Vo.GroupVo;
 import org.ymail.enums.EmailGroup;
 import org.ymail.enums.EmailStatus;
 import org.ymail.filter.UserContext;
-import org.ymail.mapper.AttachMapper;
-import org.ymail.mapper.EmailMapper;
-import org.ymail.mapper.EmailReportMapper;
-import org.ymail.mapper.GroupMapper;
+import org.ymail.mapper.*;
 import org.ymail.resp.EmailBo;
 import org.ymail.resp.EmailResp;
 import org.ymail.service.EmailService;
-import org.ymail.util.MPage;
-import org.ymail.util.Result;
-import org.ymail.util.SendCode;
-import org.ymail.util.ThreadPool;
+import org.ymail.util.*;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.ymail.enums.EmailStatus.READ_ALREADY;
@@ -44,20 +36,8 @@ public class EmailServiceImpl implements EmailService {
     private final AttachMapper attachMapper;
     private final EmailReportMapper emailReportMapper;
     private final GroupMapper groupMapper;
+    private final UserMapper userMapper;
 
-    /**
-     * 获得用户登录时的具体信息
-     *
-     * @return 信息
-     */
-    @Override
-    public Result<Void> getLoginInfo() {
-
-        System.out.println("执行到此");
-        System.out.println(UserContext.getUserPhone());
-        System.out.println(UserContext.getUserMail());
-        return null;
-    }
 
     @Override
     public Result<Object> getMessage() {
@@ -396,7 +376,7 @@ public class EmailServiceImpl implements EmailService {
         }
         LambdaQueryWrapper<Group> queryCountWrapper = new LambdaQueryWrapper<Group>()
                 .eq(Group::getMaster, UserContext.getUserMail());
-        if(groupMapper.selectCount(queryCountWrapper)>=6){
+        if (groupMapper.selectCount(queryCountWrapper) >= 6) {
             return Result.failure("最多允许创建6个文件夹");
         }
         val insertGroup = new Group();
@@ -404,7 +384,7 @@ public class EmailServiceImpl implements EmailService {
         insertGroup.setMaster(UserContext.getUserMail());
         insertGroup.setCount(0);
         int insert = groupMapper.insert(insertGroup);
-        if(insert<=0){
+        if (insert <= 0) {
             return Result.failure("创建文件夹失败，请重试");
         }
         if (!emails.isEmpty()) {
@@ -422,10 +402,129 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public Result<Void> sendCode(String phone) {
-         SendCode.sendCode(phone);
-         return Result.success();
+        SendCode.sendCode(phone);
+        return Result.success();
     }
 
+    @Override
+    public Result<Void> changePassWord(String oldP, String newP) {
+        String mail = UserContext.getUserMail();
+        //查询数据库，旧密码是否正确
+        UserDo user = userMapper.selectOne(new LambdaQueryWrapper<UserDo>()
+                .eq(UserDo::getMail, mail)
+                .eq(UserDo::getPassword, oldP));
+        if (user != null) {
+            user.setPassword(newP);
+            userMapper.updateById(user);
+            return Result.success();
+        } else {
+            return Result.failure("旧密码错误");
+        }
+    }
+
+    /**
+     * 获取分组信息
+     */
+    @Override
+    public Result<List<GroupVo>> getGroupInfo() {
+        Map<String, GroupVo> map = new HashMap<>();
+        String mail = UserContext.getUserMail();
+        //获得所有master的分组
+        List<Group> groups = groupMapper.selectList(new LambdaQueryWrapper<Group>()
+                .eq(Group::getMaster, mail));
+        //查询分组们下的所有邮件
+        //获得分组名称
+        List<String> groupName = groups.stream().map(Group::getName).toList();
+        //初始化map
+        groupName.forEach(
+                name -> {
+                    GroupVo groupVo = new GroupVo();
+                    groupVo.setGroup(name);
+                    groupVo.setIfSystemGroup(CodeContain.systemGroup.contains(name));
+                    map.put(name, groupVo);
+                }
+        );
+        //将系统分组放入map
+        CodeContain.systemGroup.forEach(
+                name -> {
+                    GroupVo groupVo = new GroupVo();
+                    groupVo.setGroup(name);
+                    groupVo.setIfSystemGroup(true);
+                    map.put(name, groupVo);
+                }
+        );
+
+        //查询所有邮件
+        List<Email> emails = emailMapper.selectList(new LambdaQueryWrapper<Email>()
+                .eq(Email::getMaster, mail));
+
+        emails.forEach(
+                email -> {
+                    if(map.get(email.getGroup())==null){
+                        return;
+                    }
+                    GroupVo groupVo = map.get(email.getGroup());
+                    groupVo.setTotal(groupVo.getTotal() + 1);
+                    if (email.getStatus() == READ_NOT.getKey()) {
+                        groupVo.setUnread(groupVo.getUnread() + 1);
+                    }
+                }
+        );
+        return Result.success(map.values().stream().toList());
+    }
+
+    @Override
+    public Result<Void> changeGroupName(String oldGroupName, String newGroupName) {
+        //
+        if (StrUtil.isBlank(oldGroupName) || StrUtil.isBlank(newGroupName)) {
+            return Result.failure("参数错误");
+        }
+        if (oldGroupName.equals(newGroupName)) {
+            return Result.failure("新旧分组名称相同");
+        }
+        //查看就分组
+        if (groupMapper.selectOne(new LambdaQueryWrapper<Group>()
+                .eq(Group::getMaster, UserContext.getUserMail())
+                .eq(Group::getName, oldGroupName)) == null) {
+            return Result.failure("旧分组不存在");
+        }
+        if (groupMapper.selectOne(new LambdaQueryWrapper<Group>()
+                .eq(Group::getMaster, UserContext.getUserMail())
+                .eq(Group::getName, newGroupName)) != null) {
+            return Result.failure("修改的分组名称已存在");
+        }
+        //将邮件中的分组也进行修改
+        emailMapper.update(null, new LambdaUpdateWrapper<Email>()
+                .eq(Email::getMaster, UserContext.getUserMail())
+                .eq(Email::getGroup, oldGroupName)
+                .set(Email::getGroup, newGroupName));
+
+        groupMapper.update(null, new LambdaUpdateWrapper<Group>()
+                .eq(Group::getMaster, UserContext.getUserMail())
+                .eq(Group::getName, oldGroupName)
+                .set(Group::getName, newGroupName));
+        return Result.success();
+    }
+
+    @Override
+    public Result<Void> deleteGroup(String groupName) {
+        if (groupMapper.selectOne(new LambdaQueryWrapper<Group>()
+                .eq(Group::getMaster, UserContext.getUserMail())
+                .eq(Group::getName, groupName)) == null) {
+            return Result.failure("分组不存在");
+        }
+
+        if (emailMapper.selectCount(new LambdaQueryWrapper<Email>()
+                .eq(Email::getMaster, UserContext.getUserMail())
+                .eq(Email::getGroup, groupName)) > 1) {
+            return Result.failure("分组下存在邮件，请先删除邮件");
+        }
+
+        groupMapper.delete(new LambdaQueryWrapper<Group>()
+                .eq(Group::getMaster, UserContext.getUserMail())
+                .eq(Group::getName, groupName));
+        return Result.success();
+    }
 
 
 }

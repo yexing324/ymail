@@ -32,6 +32,16 @@ public class UserDo extends BaseDO {
     @NotBlank(message = "手机号不能为空",groups = Register.class)
     private String phone;
 
+    /**
+     * 头像名称
+     */
+    private String avatarName;
+
+    /**
+     * 昵称
+     */
+    private String nickname;
+
 
     /* 分组校验 */
     public @interface Register {}

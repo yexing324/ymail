@@ -204,7 +204,7 @@
   <el-scrollbar
       style="height: 100%;text-align: center"
   >
-    <div style="min-height: 400px">
+    <div :hidden="!ifNullHidden" style="min-height: 400px">
       <template v-for="(item ,index) in data">
         <div v-if="item.length!=0">
           <div v-if="group=='收件箱'" style="text-align: left;margin: 9px 0 3px 9px;font-size: 13px;">
@@ -248,6 +248,13 @@
 
     </div>
 
+    <div
+      :hidden="ifNullHidden"
+    >
+      <img src="../../assets/null.png" alt="还没有邮件哦">
+      <div style="color: grey">还没有邮件哦</div>
+    </div>
+
 
     <div style="height: 100px;margin-top: 20px;">
       <el-button-group>
@@ -286,6 +293,8 @@ import route from "@/router";
 //存放几个table的实例
 const refsMap = ref({} as any);
 
+//没有邮件图片是否隐藏
+const ifNullHidden = ref(true)
 import eventBus from '@/assets/util/eventBus'
 import _ from "lodash";
 
@@ -475,6 +484,11 @@ function getMessageList(flag = false, page = 1, size = 20) {
       } else {
         data.value[0] = (res.data.data.records)
         currentTotal.value = res.data.data.total
+      }
+      if(currentTotal.value!=0){
+        ifNullHidden.value=true
+      }else{
+        ifNullHidden.value=false
       }
       pages.value = res.data.data.pages == 0 ? 1 : res.data.data.pages
       currentPage.value = res.data.data.current

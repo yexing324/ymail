@@ -28,13 +28,18 @@ public class UserController {
         return userService.register(reqParam);
     }
 
-    @GetMapping("/getLoginInfo")
-    public Result<Void>getLoginInfo(){
-        return emailService.getLoginInfo();
+    @GetMapping("/getUserInfo")
+    public Result<UserDo>getUserInfo(){
+        return userService.getUserInfo();
     }
 
     @GetMapping("/sendCode")
     public Result<Void>sendCoed(String phone){
         return emailService.sendCode(phone);
+    }
+
+    @GetMapping("/changePassWord")
+    public Result<Void>changePassWord(String oldP,String newP){
+        return emailService.changePassWord(oldP,newP);
     }
 }
