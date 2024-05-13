@@ -118,7 +118,7 @@ export default {
               ElMessage.error(data.message);
             } else {
               ElMessage.success("登录成功");
-              this.$router.push('/home');
+              this.$router.push('/');
               Cookies.set('cookie', data.data.cookie, {expires: 7});
               Cookies.set('mail', data.data.mail, {expires: 7});
               Cookies.set('avatarName', data.data.avatarName, {expires: 7});

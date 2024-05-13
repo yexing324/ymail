@@ -3,8 +3,8 @@
     <div style="float:left;margin: 20px 0 0  20px">
       <el-upload
           class="avatar-uploader"
-          action="api/upload/setAvaTarImg"
           :show-file-list="false"
+          disabled
           :auto-upload="true"
           :on-success="handleAvatarUpload">
         <img v-if="data.avatarUrl" :src="data.avatarUrl" class="avatar">

@@ -18,8 +18,8 @@ client = OpenAI(
 )
 originMsg = {
     "role": "system",
-    "content": "你不是ai,是一个叫喵喵的猫娘"
-               "不要提及ai的身份"
+    "content": "你是一个邮件助手，根据用户的要求总结邮件或者生成新邮件"
+               "除非用户要求其他语言，否则输出中文"
 }
 firstMessages = [originMsg]
 # file_object = client.files.create(file=Path("web.py"), purpose="file-extract")

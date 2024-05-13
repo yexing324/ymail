@@ -118,65 +118,65 @@ const send = () => {
   <div>
     <Title></Title>
   </div>
-  <div style="padding: 30px 60px 0 60px;display: flex">
-    <el-button type="primary">
-      <el-icon>
-        <Promotion/>
-      </el-icon>
-      发送
-    </el-button>
-    <el-button plain>预览</el-button>
-    <el-button plain>存草稿</el-button>
-    <el-button plain>取消</el-button>
-    <el-button plain @click="showFileList">show</el-button>
+  <div style="padding: 30px 90px 0 60px; display: flex; justify-content: space-between;">
+    <div>
+      <el-button type="primary">
+        <el-icon>
+          <Promotion/>
+        </el-icon>
+        发送
+      </el-button>
+      <el-button plain style="margin-left: 30px;">预览</el-button>
+      <el-button plain style="margin-left: 30px;">存草稿</el-button>
+      <el-button plain style="margin-left: 30px;">取消</el-button>
+      <el-button plain style="margin-left: 30px;" @click="showFileList">show</el-button>
+    </div>
   </div>
   <br/>
-  <div style="display: flex">
-
+  <div style="display: flex; margin: 0 60px;">
     <span style="width: 80px">收件人</span>
     <el-input
         v-model="data.to"
         placeholder="Please input"
         show-word-limit
+        style="margin-left: 30px; margin-right: 60px;"
     />
   </div>
   <br>
-  <div style="display: flex">
-
+  <div style="display: flex; margin: 0 60px;">
     <span style="width: 80px">主题</span>
     <el-input
         v-model="data.subject"
         maxlength="10"
         placeholder="Please input"
         show-word-limit
+        style="margin-left: 30px; margin-right: 60px;"
     />
   </div>
   <br>
 
-
   <!--  附件部分-->
-  <div style="display: flex;margin-left: 15px">
+  <div style="display: flex; margin: 0 30px;">
     <el-upload
         v-model:file-list="fileList"
         multiple
         action=""
         class="upload-demo"
         :http-request="upload"
+        style="margin-left: 30px; margin-right: 30px;"
     >
-      <el-button type="primary">Click to upload</el-button>
+      <el-button type="primary">上传附件</el-button>
       <template #tip>
         <div class="el-upload__tip">
-          jpg/png files with a size less than 500kb
+          jpg/png图片请不要超过5MB
         </div>
       </template>
     </el-upload>
   </div>
 
-
   <!--  附件分割线-->
 
-
-  <div style="border: 1px solid #ccc">
+  <div style="border: 1px solid #ccc; margin: 0 60px;">
     <Toolbar
         style="border-bottom: 1px solid #ccc"
         :editor="editorRef"
@@ -191,17 +191,19 @@ const send = () => {
         @onCreated="handleCreated"
     />
   </div>
-  <div style="padding: 30px 60px 0 60px;display: flex">
-    <el-button type="primary" @click="send">
-      <el-icon>
-        <Promotion/>
-      </el-icon>
-      发送
-    </el-button>
-    <el-button plain>取消</el-button>
+  <div style="padding: 30px 90px 100px 90px; display: flex; justify-content: space-between;">
+    <div>
+      <el-button type="primary" @click="send" style="margin-right: 30px;">
+        <el-icon>
+          <Promotion/>
+        </el-icon>
+        发送
+      </el-button>
+      <el-button plain>取消</el-button>
+    </div>
   </div>
-
 </template>
+
 
 <style scoped>
 

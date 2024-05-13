@@ -23,11 +23,6 @@ const routes: Array<RouteRecordRaw> = [
         component: LoginView
     },
     {
-        path: '/',
-        name: '',
-        component: HomeView
-    },
-    {
         path: '/write',
         component: WriteMessage
     },
@@ -55,12 +50,12 @@ const routes: Array<RouteRecordRaw> = [
         ]
     },
     {
-        path: '/home',
+        path: '/',
         name: 'home',
         component: HomeView,
         children: [
             {
-                path: '',
+                path: '/',
                 component: HomeDefault
             },
             {

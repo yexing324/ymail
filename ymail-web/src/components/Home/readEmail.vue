@@ -106,7 +106,7 @@ import Chat from "@/components/chat/Chat.vue";
         <br>
 
 
-        <div style="background: #eff5fb;padding: 10px;width: 98%">
+        <div style="background: #eff5fb;padding: 10px;width: 97%">
           <div style="text-align:left;margin-bottom: 10px;">
             <span></span><strong>{{ data.email.subject }}</strong>
           </div>

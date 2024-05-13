@@ -80,7 +80,7 @@ const test = () => {
 
 function returnHome() {
   router.push({
-    path: '/home',
+    path: '/',
   })
 }
 
